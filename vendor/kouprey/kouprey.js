@@ -812,4 +812,4 @@ com.deadpixi.kouprey.U = function (block) {
 };
 
 /* ------------------------------ EXPORTS ------------------------------ */
-if (! typeof exports == "undefined") exports.com = com;
+if (typeof module !== "undefined" && module.exports) module.exports = com;
