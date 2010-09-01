@@ -1,0 +1,11 @@
+{ "name" : "irc-js"
+, "version" : "0.2.0"
+, "author" : "Gianni Chiappetta <gianni@runlevel6.org> (http://gf3.ca)"
+, "main" : "./lib/irc"
+, "license" :
+  { "type" : "Public Domain"
+  , "url" : "http://github.com/gf3/IRC-js/raw/master/UNLICENSE"
+  }
+, "repository" : { "type" : "git", "url" : "https://gf3@github.com/gf3/IRC-js.git" }
+}
+
