@@ -5,7 +5,7 @@ line_number: 9
 description: |
   An IRC library for node.js
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "new IRC"
@@ -29,7 +29,7 @@ arguments:
   description: >
     Options for specific instance.
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#connect"
@@ -50,7 +50,7 @@ arguments:
   description: >
     Optional callback to be executed when the connection is established an ready.
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#disconnect"
@@ -65,7 +65,7 @@ signatures:
  -
   signature: "IRC#disconnect()"
   return_value: "self"
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#raw"
@@ -92,7 +92,7 @@ arguments:
   description: >
     Raw IRC command to be sent to server
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#addListener"
@@ -123,7 +123,7 @@ arguments:
   description: >
     Event listener, called when event is emitted.
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#removeListener"
@@ -154,7 +154,7 @@ arguments:
   description: >
     Event listener to unregister
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#listenOnce"
@@ -185,7 +185,7 @@ arguments:
   description: >
     Event listener, called when event is emitted.
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#pass"
@@ -213,7 +213,7 @@ arguments:
   description: >
     Server password
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#nick"
@@ -238,7 +238,7 @@ arguments:
   description: >
     Desired nick name.
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#user"
@@ -282,7 +282,7 @@ arguments:
   description: >
     Real name
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#oper"
@@ -313,7 +313,7 @@ arguments:
   description: >
     Password
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#quit"
@@ -340,7 +340,7 @@ arguments:
   description: >
     Quit message
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#join"
@@ -372,7 +372,7 @@ arguments:
   description: >
     Channel key
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#part"
@@ -397,7 +397,7 @@ arguments:
   description: >
     Channel to part
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#channel_mode"
@@ -421,7 +421,7 @@ signatures:
  -
   signature: "IRC#channel_mode(channel, mode[, limit][, user][, ban_mask])"
   return_value: "self"
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#user_mode"
@@ -446,7 +446,7 @@ arguments:
   description: >
     Mode to apply
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#topic"
@@ -489,7 +489,7 @@ arguments:
   description: >
     Callback to receive the channel topic. The first argument is the channel, the second is the topic.
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#names"
@@ -522,7 +522,7 @@ arguments:
   description: >
     Callback to receive the names list. The first argument is the channel, the second is an array of names.
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#list"
@@ -557,7 +557,7 @@ arguments:
   description: >
     Callback to receive the channel list. As it's single parameter it receives one or many arrays with three elements. The first element is the channel name, the second is the user count, the third is the topic.
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#invite"
@@ -588,7 +588,7 @@ arguments:
   description: >
     Channel to invite user to.
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#kick"
@@ -626,7 +626,7 @@ arguments:
   description: >
     Optional comment for kicking.
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#version"
@@ -660,7 +660,7 @@ arguments:
   description: >
     Callback to receive server version info.
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC#privmsg"
@@ -698,7 +698,7 @@ arguments:
   description: >
     Flood protection for long messages, if `true` will delay messages. Default: `false`.
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC.version"
@@ -712,7 +712,7 @@ signatures:
  -
   signature: "IRC.version"
   return_value: "String"
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
 id: "IRC.options"
@@ -737,4 +737,4 @@ description: |
            }
          }
 
-file: lib/irc.js
+file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
