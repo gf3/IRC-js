@@ -14,7 +14,7 @@ task :build_doc do
     :src_code_href => proc { |file, line|
       "http://github.com/gf3/IRC-js/#{file}##{line}"
     },
-    :pretty_urls => false,
+    :pretty_urls => true,
     :bust_cache => true,
     :name => 'IRC-js | An IRC library for node.js',
     :short_name => 'IRC-js',

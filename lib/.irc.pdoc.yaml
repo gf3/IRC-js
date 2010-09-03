@@ -400,7 +400,7 @@ arguments:
 file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
-id: "IRC#channel_mode"
+id: "IRC#channelMode"
 parent_id: "IRC"
 type: instance method
 line_number: 435
@@ -415,16 +415,16 @@ description: |
   
   ### Examples
   
-      irc_instance.channel_mode('#asl', '+im'); // Makes `#asl` moderated and invite only
+      irc_instance.channelMode('#asl', '+im'); // Makes `#asl` moderated and invite only
 
 signatures:
  -
-  signature: "IRC#channel_mode(channel, mode[, limit][, user][, ban_mask])"
+  signature: "IRC#channelMode(channel, mode[, limit][, user][, ban_mask])"
   return_value: "self"
 file: /Users/gianni/Projects/javascript/IRC/lib/irc.js
 
 ---
-id: "IRC#user_mode"
+id: "IRC#userMode"
 parent_id: "IRC"
 type: instance method
 line_number: 450
@@ -433,11 +433,11 @@ description: |
   
   ### Examples
   
-      irc_instance.user_mode('-o'); // De-ops user
+      irc_instance.userMode('-o'); // De-ops user
 
 signatures:
  -
-  signature: "IRC#user_mode(mode)"
+  signature: "IRC#userMode(mode)"
   return_value: "self"
 arguments:
  -
@@ -673,7 +673,7 @@ description: |
   
   ### Examples
   
-      irc_instance.privmsg('#asl', 'What's up ladiiieeeessssss!?'); // Ask the ladies `what's up`
+      irc_instance.privmsg('#asl', 'What\'s up ladiiieeeessssss!?'); // Ask the ladies `what's up`
 
 signatures:
  -
