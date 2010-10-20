@@ -7,7 +7,7 @@
   , "temp01"
   , "Diogo Gomes <maushu@graphnode.com> (http://www.graphnode.com/)"
   ]
-. "homepage" : "http://gf3.github.com/IRC-js/"
+, "homepage" : "http://gf3.github.com/IRC-js/"
 , "version" : "0.2.2"
 , "main" : "./lib/irc"
 , "directories" : { "lib" : "./lib" }
