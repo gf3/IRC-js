@@ -1,0 +1,48 @@
+Message         ← Prefix? Command Params? CRLF
+
+
+
+Prefix          ← ":" ( Server / Person )
+
+Server          ← ( AlphaNum / SquareBrackets / [ _ - . | ] )+ !( User / Host ) S
+
+Person          ← Nick User? Host? S
+
+Nick            ← ( AlphaNum / SquareBrackets / CurlyBrackets / Backtick / [ _ - ^ | ] )+
+
+User            ← "!" ( AlphaNum / SquareBrackets / [ _ - = . ~ ] )+
+
+Host            ← "@" ( AlphaNum / SquareBrackets / [ _ - . | : / ] )+
+
+
+
+Command         ← ( Letter+ / Num{3} )
+
+
+
+Params          ← S ( Middle S? )* Trailing?
+
+Middle          ← ( !":" NonTerminating )+
+
+Trailing        ← ":" ( NonTerminating / S )+
+
+
+
+NonTerminating  ← [^ U+000A U+000D ]
+
+SquareBrackets  ← [ [ U+005D ]
+
+CurlyBrackets   ← [ { } ]
+
+Backtick        ← [ U+0060 ]
+
+AlphaNum        ← ( Letter / Num )
+
+Letter          ← [ a-z A-Z ]
+
+Num             ← [ 0-9 ]
+
+CRLF            ← [ U+000D ] [ U+000A ]
+
+S               ← [ U+0020 ]+
+
