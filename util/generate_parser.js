@@ -1,5 +1,5 @@
-var Colour = require( '../vendor/coloured' )
-  , PanPG = require( '../vendor/PanPG/PanPG' )
+var Colour = require( '../node_modules/coloured' )
+  , PanPG = require( '../node_modules/PanPG/PanPG' )
   , path = require( 'path' )
   , fs = require( 'fs' )
   , PEG = fs.readFileSync( path.join( __dirname, '..', 'lib', 'irc.peg' ) ).toString()

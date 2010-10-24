@@ -1,7 +1,13 @@
+
 var fs = require( 'fs' )
   , path = require( 'path' )
-  , Compiler = require( path.join( __dirname, '..', 'lib', 'compiler' ) )
+  , Compiler
   , messages
+
+require.paths.unshift( path.join( __dirname, '..', 'node_modules' ) )
+require.paths.unshift( path.join( __dirname, '..', 'lib' ) )
+
+Compiler = require( path.join( __dirname, '..', 'lib', 'compiler' ) )
 
 /* ------------------------------ Fixtures ------------------------------ */
 messages = JSON.parse( fs.readFileSync( path.join( __dirname, 'messages.json' ) ).toString() )
