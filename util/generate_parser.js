@@ -1,4 +1,4 @@
-var Colour = require( '../vendor/coloured/lib/coloured' )
+var Colour = require( '../vendor/coloured' )
   , PanPG = require( '../vendor/PanPG/PanPG' )
   , path = require( 'path' )
   , fs = require( 'fs' )

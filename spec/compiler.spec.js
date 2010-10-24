@@ -13,19 +13,19 @@ exports[ 'Can parse Freenode cloaks' ] = function( test ) { var m
   test.finish()
 }
 
-exports[ 'Can parse server messages' ] = function( test ) {
+exports[ 'Can parse server messages' ] = function( test ) { var m
   m = Compiler.compile( ':brown.freenode.net 333 js-irc #runlevel6 gf3 1252481170=\r\n' )
   test.equal( 'brown.freenode.net', m.server )
   test.finish()
 }
 
-exports[ 'Can parse server messages with no periods' ] = function( test ) {
+exports[ 'Can parse server messages with no periods' ] = function( test ) { var m
   m = Compiler.compile( ':localhost 333 js-irc #runlevel6 gf3 1252481170=\r\n' )
   test.equal( 'localhost', m.server )
   test.finish()
 }
 
-exports[ 'Can parse nicks with backticks' ] = function( test ) {
+exports[ 'Can parse nicks with backticks' ] = function( test ) { var m
   m = Compiler.compile( ':nick`!u@h JOIN :#chan\r\n' )
   test.equal( 'nick`', m.person.nick )
   test.finish()
