@@ -20,9 +20,9 @@ Command         ← ( Letter+ / Num{3} )
 
 
 
-Params          ← S ( Middle S? )* Trailing?
+Params          ← S Middle* Trailing?
 
-Middle          ← ( !":" NonTerminating )+
+Middle          ← ( !":" !S NonTerminating )+ S?
 
 Trailing        ← ":" ( NonTerminating / S )+
 
