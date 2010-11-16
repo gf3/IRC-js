@@ -1,7 +1,8 @@
-var Colour = require( '../node_modules/coloured' )
+var ColouredLog = require( '../node_modules/coloured-log' )
   , PanPG = require( '../node_modules/PanPG/PanPG' )
   , path = require( 'path' )
   , fs = require( 'fs' )
+  , Log
   , PEG = fs.readFileSync( path.join( __dirname, '..', 'lib', 'irc.peg' ) ).toString()
   , options =
     { 'commonjs': true
@@ -11,31 +12,23 @@ var Colour = require( '../node_modules/coloured' )
   , filename = path.join( __dirname, '..', 'lib', 'parser.js' )
 
 /* ------------------------------ Build Parser ------------------------------ */
-Colour.extendString()
+Log = new ColouredLog( ColouredLog.DEBUG )
 
 try {
   parser = PanPG.generateParser( PEG, options )
   fs.writeFile( filename, parser, function( err ) {
     if ( err ) {
-      error( 'Unable to write file.' )
-      console.log( err )
+      Log.error( 'Unable to write file.' )
+      console.log( err.message )
+      console.log( err.stack )
     }
     else
-      success( 'Wrote file: "' + filename + '"' )
+      Log.info( 'Wrote file: "' + filename + '"' )
   })
 }
 catch ( e ) {
-  error( 'Parser could not be generated.' )
+  Log.error( 'Parser could not be generated.' )
   console.log( e.message )
   console.log( e.stack )
-}
-
-/* ------------------------------ Functions ------------------------------ */
-function success( msg ) {
-  console.log( '[SUCCESS] '.green().bold() + msg )
-}
-
-function error( msg ) {
-  console.log( '[ERROR] '.red().bold() + msg )
 }
 
