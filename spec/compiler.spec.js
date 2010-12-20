@@ -45,6 +45,12 @@ exports[ 'Can parse multiple middle params properly' ] = function( test ) { var 
   test.finish()
 }
 
+exports[ 'Can parse empty trailing parameters' ] = function( test ) { var m
+  m = Compiler.compile( ':vitor-br!vitor-p.c@189.105.71.49 QUIT :\r\n' )
+  test.equal( '', m.params[0] )
+  test.finish()
+}
+
 /* ------------------------------ Only Test Successful Compilation ------------------------------ */
 messages.forEach( function( message, idx ) {
   exports[ 'Message compilation #' + idx + ': "' + message.slice( 0, -2 ) + '"' ] = function( test ) {

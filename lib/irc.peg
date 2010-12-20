@@ -24,7 +24,7 @@ Params          ← S Middle* Trailing?
 
 Middle          ← ( !":" !S NonTerminating )+ S?
 
-Trailing        ← ":" ( NonTerminating / S )+
+Trailing        ← ":" ( NonTerminating / S )*
 
 
 
