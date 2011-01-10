@@ -25,6 +25,12 @@ exports[ 'Can parse server messages' ] = function( test ) { var m
   test.finish()
 }
 
+exports[ 'Can parse asterisks in server names' ] = function( test ) { var m
+  m = Compiler.compile( ':*.quakenet.org MODE #altdeath +v Typone\r\n' )
+  test.equal( '*.quakenet.org', m.server )
+  test.finish()
+}
+
 exports[ 'Can parse server messages with no periods' ] = function( test ) { var m
   m = Compiler.compile( ':localhost 333 js-irc #runlevel6 gf3 1252481170=\r\n' )
   test.equal( 'localhost', m.server )
