@@ -8,7 +8,7 @@
   , "Diogo Gomes <maushu@graphnode.com> (http://www.graphnode.com/)"
   ]
 , "homepage" : "http://gf3.github.com/IRC-js/"
-, "version" : "0.2.12"
+, "version" : "0.2.13"
 , "main" : "./lib/irc"
 , "directories" : { "lib" : "./lib", "node_libraries" : "./node_libraries" }
 , "engines" : [ "node >=0.2.0" ]

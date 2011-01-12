@@ -43,6 +43,12 @@ exports[ 'Can parse nicks with backticks' ] = function( test ) { var m
   test.finish()
 }
 
+exports[ 'Can parse nicks with slashes' ] = function( test ) { var m
+  m = Compiler.compile( ':ni\\ck!u@h JOIN :#chan\r\n' )
+  test.equal( 'ni\\ck', m.person.nick )
+  test.finish()
+}
+
 exports[ 'Can parse multiple middle params properly' ] = function( test ) { var m
   m = Compiler.compile( ':irc.server 353 nick = #chan :nick nick2\r\n' )
   test.equal( 'nick', m.params[0] )

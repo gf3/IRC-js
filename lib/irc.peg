@@ -8,7 +8,7 @@ Server          ← ( AlphaNum / SquareBrackets / [ _ - . | * ] )+ !( User / Hos
 
 Person          ← Nick User? Host? S
 
-Nick            ← ( AlphaNum / SquareBrackets / CurlyBrackets / Backtick / [ _ - ^ | ] )+
+Nick            ← ( AlphaNum / SquareBrackets / CurlyBrackets / Backtick / [ _ - ^ | \ ] )+
 
 User            ← "!" ( AlphaNum / SquareBrackets / [ _ - = . ~ ] )+
 
