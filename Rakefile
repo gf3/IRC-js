@@ -2,6 +2,7 @@ require 'rubygems'
 require 'rake'
 require 'pdoc'
 
+PWD = Dir.pwd
 OUTPUT_DIR = '/tmp/irc-js_docs'
 
 desc 'Builds the documentation'
@@ -11,7 +12,8 @@ task :build_doc do
     destination:        OUTPUT_DIR,
     syntax_highlighter: :pygments,
     markdown_parser:    :maruku,
-    src_code_href:      proc {|file, line| "https://github.com/gf3/IRC-js/blob/master/#{file}#L#{line}" },
+    src_code_text:      'View Source on GitHub &rarr;',
+    src_code_href:      -> o { "https://github.com/gf3/IRC-js/blob/master/#{o.file.gsub PWD + '/', ''}#L#{o.line_number}" },
     pretty_urls:        true,
     bust_cache:         true,
     name:               'IRC-js | An IRC library for node.js',
