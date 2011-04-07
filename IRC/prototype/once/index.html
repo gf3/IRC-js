@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>IRC-js  v0.2.18 API documentation | IRC#invite</title>
+  <title>IRC-js  v0.2.18 API documentation | IRC#once</title>
   <meta name="generator" content="PDoc" />
   
   <script charset="utf-8" src="../../../javascripts/pdoc/prototype.js" type="text/javascript"></script>
@@ -44,7 +44,7 @@
 <li><div class="menu-item"><a class="instance-method" href="../../../IRC/prototype/channelMode/" title="IRC#channelMode (instance method)">channelMode</a></div></li>
 <li><div class="menu-item"><a class="instance-method" href="../../../IRC/prototype/connect/" title="IRC#connect (instance method)">connect</a></div></li>
 <li><div class="menu-item"><a class="instance-method" href="../../../IRC/prototype/disconnect/" title="IRC#disconnect (instance method)">disconnect</a></div></li>
-<li><div class="menu-item"><a class="instance-method current" href="../../../IRC/prototype/invite/" title="IRC#invite (instance method)">invite</a></div></li>
+<li><div class="menu-item"><a class="instance-method" href="../../../IRC/prototype/invite/" title="IRC#invite (instance method)">invite</a></div></li>
 <li><div class="menu-item"><a class="instance-method" href="../../../IRC/prototype/join/" title="IRC#join (instance method)">join</a></div></li>
 <li><div class="menu-item"><a class="instance-method" href="../../../IRC/prototype/kick/" title="IRC#kick (instance method)">kick</a></div></li>
 <li><div class="menu-item"><a class="instance-method" href="../../../IRC/prototype/list/" title="IRC#list (instance method)">list</a></div></li>
@@ -52,7 +52,7 @@
 <li><div class="menu-item"><a class="instance-method" href="../../../IRC/prototype/names/" title="IRC#names (instance method)">names</a></div></li>
 <li><div class="menu-item"><a class="instance-method" href="../../../IRC/prototype/nick/" title="IRC#nick (instance method)">nick</a></div></li>
 <li><div class="menu-item"><a class="instance-method" href="../../../IRC/prototype/on/" title="IRC#on (instance method)">on</a></div></li>
-<li><div class="menu-item"><a class="instance-method" href="../../../IRC/prototype/once/" title="IRC#once (instance method)">once</a></div></li>
+<li><div class="menu-item"><a class="instance-method current" href="../../../IRC/prototype/once/" title="IRC#once (instance method)">once</a></div></li>
 <li><div class="menu-item"><a class="instance-method" href="../../../IRC/prototype/oper/" title="IRC#oper (instance method)">oper</a></div></li>
 <li><div class="menu-item"><a class="instance-method" href="../../../IRC/prototype/part/" title="IRC#part (instance method)">part</a></div></li>
 <li><div class="menu-item"><a class="instance-method" href="../../../IRC/prototype/pass/" title="IRC#pass (instance method)">pass</a></div></li>
@@ -85,17 +85,17 @@
   
     <li>&rarr; <a href="../../../IRC/" title="IRC (class)">IRC</a></li>
   
-    <li>&rarr; <a href="../../../IRC/prototype/invite/" title="IRC#invite (instance method)">invite</a></li>
+    <li>&rarr; <a href="../../../IRC/prototype/once/" title="IRC#once (instance method)">once</a></li>
   
 </ul>
 
 <h2 class="page-title">
-  <span class="type">instance method</span> IRC#invite
+  <span class="type">instance method</span> IRC#once
 </h2>
 
 
   
-  <p id="src_code_href"><a href="https://github.com/gf3/IRC-js/blob/master/#<PDoc::Models::InstanceMethod:0x00000103b06fb8>#L"></a></p>
+  <p id="src_code_href"><a href="https://github.com/gf3/IRC-js/blob/master/#<PDoc::Models::InstanceMethod:0x00000103afb028>#L"></a></p>
 
 
 
@@ -108,38 +108,40 @@
   <div class="section-content">
     <div class="method-description">
       
-        <pre class="syntax"><code class="ebnf">IRC#invite( nickname, channel ) &rarr; self</code></pre>
+        <pre class="syntax"><code class="ebnf">IRC#once( event, listener ) &rarr; null</code></pre>
 
   <ul class="argument-list">
     
       <li>
-        <code class="argument-name">nickname</code>
+        <code class="argument-name">event</code>
         
           <span class="argument-types">(<code>String</code>)</span>
         
-         &ndash; User to invite.
+         &ndash; Event to listen for
       </li>
     
       <li>
-        <code class="argument-name">channel</code>
+        <code class="argument-name">listener</code>
         
-          <span class="argument-types">(<code>String</code>)</span>
+          <span class="argument-types">(<code>Function</code>)</span>
         
-         &ndash; Channel to invite user to.
+         &ndash; Event listener, called when event is emitted.
       </li>
     
   </ul> <!-- .argument-list -->
 
       
 
-      <p>Invite a user to a channel.</p>
+      <p>Listen only once for an incoming IRC message.</p>
 
 <h3 id='examples'>Examples</h3>
-<div class='highlight'><pre><span class='nx'>irc_instance</span><span class='p'>.</span><span class='nx'>invite</span><span class='p'>(</span> <span class='s1'>&#39;BloodNinja&#39;</span><span class='p'>,</span> <span class='s1'>&#39;#asl&#39;</span> <span class='p'>)</span> <span class='c1'>// I put on my robe and wizard hat...</span>
+<div class='highlight'><pre><span class='nx'>irc_instance</span><span class='p'>.</span><span class='nx'>once</span><span class='p'>(</span> <span class='s1'>&#39;ping&#39;</span><span class='p'>,</span> <span class='nx'>pingListener</span> <span class='p'>)</span> <span class='c1'>// Listens for the *next* PING message from server, then unregisters itself</span>
 </pre>
 </div>
       
       
+  <p class="alias aliases">Aliased as: <code><a href="../../../IRC/prototype/listenOnce/" title="IRC#listenOnce (instance method)">IRC#listenOnce</a></code></p>
+
 
 
 

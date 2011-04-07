@@ -622,6 +622,9 @@ p.related-to {
   border-right: 1px solid #636363;
   overflow-y: scroll;
   overflow-x: hidden;
+  
+  /* Fixes jagged text in Safari 5. */
+  -webkit-font-smoothing: antialiased;
 }
 
 #search_pane {
@@ -673,5 +676,6 @@ input.ghosted {
   }
 
 #src_code_href {
-	float: right;
+	font-size: 11px;
+	margin: -15px 0 15px 120px;
 }

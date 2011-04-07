@@ -5,8 +5,10 @@ PDoc.elements = {
 'IRC#connect': { 'name': 'IRC#connect', 'type': 'instance method', 'path': 'IRC/prototype/connect/' },
 'IRC#disconnect': { 'name': 'IRC#disconnect', 'type': 'instance method', 'path': 'IRC/prototype/disconnect/' },
 'IRC#raw': { 'name': 'IRC#raw', 'type': 'instance method', 'path': 'IRC/prototype/raw/' },
+'IRC#on': { 'name': 'IRC#on', 'type': 'instance method', 'path': 'IRC/prototype/on/' },
 'IRC#addListener': { 'name': 'IRC#addListener', 'type': 'instance method', 'path': 'IRC/prototype/addListener/' },
 'IRC#removeListener': { 'name': 'IRC#removeListener', 'type': 'instance method', 'path': 'IRC/prototype/removeListener/' },
+'IRC#once': { 'name': 'IRC#once', 'type': 'instance method', 'path': 'IRC/prototype/once/' },
 'IRC#listenOnce': { 'name': 'IRC#listenOnce', 'type': 'instance method', 'path': 'IRC/prototype/listenOnce/' },
 'IRC#pass': { 'name': 'IRC#pass', 'type': 'instance method', 'path': 'IRC/prototype/pass/' },
 'IRC#nick': { 'name': 'IRC#nick', 'type': 'instance method', 'path': 'IRC/prototype/nick/' },
@@ -24,6 +26,6 @@ PDoc.elements = {
 'IRC#kick': { 'name': 'IRC#kick', 'type': 'instance method', 'path': 'IRC/prototype/kick/' },
 'IRC#version': { 'name': 'IRC#version', 'type': 'instance method', 'path': 'IRC/prototype/version/' },
 'IRC#privmsg': { 'name': 'IRC#privmsg', 'type': 'instance method', 'path': 'IRC/prototype/privmsg/' },
-'IRC.version': { 'name': 'IRC.version', 'type': 'class property', 'path': 'IRC/version/' },
+'IRC.info': { 'name': 'IRC.info', 'type': 'class property', 'path': 'IRC/info/' },
 'IRC.options': { 'name': 'IRC.options', 'type': 'namespace', 'path': 'IRC/options/' }
 };
