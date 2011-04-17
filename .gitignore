@@ -1,3 +1,8 @@
+# NPM stuff
+node_modules/.bin
+node_modules/coloured-log
+npm-debug.log
+
 tags
 doc
 lib/.irc.pdoc.yaml
