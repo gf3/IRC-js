@@ -6,9 +6,10 @@
   , "Martin Häger <martin.haeger@gmail.com> (http://freeasinbeard.org)"
   , "temp01"
   , "Diogo Gomes <maushu@graphnode.com> (http://www.graphnode.com/)"
+  , "Nathan Rajlich <nathan@tootallnate.net> (http://tootallnate.net)"
   ]
 , "homepage" : "http://gf3.github.com/IRC-js/"
-, "version" : "0.2.18"
+, "version" : "0.2.19"
 , "main" : "./lib/irc"
 , "directories" : { "lib" : "./lib", "node_libraries" : "./node_libraries" }
 , "engines" : [ "node >=0.2.0" ]
