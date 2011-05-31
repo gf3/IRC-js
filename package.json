@@ -13,10 +13,14 @@
 , "main" : "./lib/irc"
 , "directories" : { "lib" : "./lib", "node_libraries" : "./node_libraries" }
 , "engines" : [ "node >=0.2.0" ]
-, "bundledDependencies" :
+, "dependencies" :
   { "coloured-log" : "0.9.4",
     "PanPG": "0.0.9"
   }
+, "bundledDependencies" :
+  [ "coloured-log",
+    "PanPG"
+  ]
 , "devDependencies" :
   { "async_testing": "0.3.x"
   }
