@@ -32,7 +32,7 @@ The following code:
 
 ...will output something like this:
 
-![Example Logging](http://v3n.us/26ea9600781141127ab9989bf5ff30ab.png)
+![Example Logging](http://v3n.us/403507afa606f9e59228e54bb74c0c7d.png)
 
 ## Special Thanks
 
