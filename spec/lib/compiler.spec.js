@@ -1,4 +1,3 @@
-
 var fs = require( 'fs' )
   , path = require( 'path' )
   , Compiler
@@ -7,10 +6,10 @@ var fs = require( 'fs' )
 require.paths.unshift( path.join( __dirname, '..', 'node_modules' ) )
 require.paths.unshift( path.join( __dirname, '..', 'lib' ) )
 
-Compiler = require( path.join( __dirname, '..', 'lib', 'compiler' ) )
+Compiler = require( path.join( __dirname, '..', '..', 'lib', 'compiler' ) )
 
 /* ------------------------------ Fixtures ------------------------------ */
-messages = JSON.parse( fs.readFileSync( path.join( __dirname, 'messages.json' ) ).toString() )
+messages = JSON.parse( fs.readFileSync( path.join( __dirname, '..', 'fixtures', 'messages.json' ) ).toString() )
 
 /* ------------------------------ Tests ------------------------------ */
 exports[ 'Can parse Freenode cloaks' ] = function( test ) { var m

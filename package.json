@@ -17,10 +17,6 @@
   { "coloured-log" : "0.9.6",
     "PanPG": "0.0.9"
   }
-, "bundledDependencies" :
-  [ "coloured-log",
-    "PanPG"
-  ]
 , "devDependencies" :
   { "async_testing": "0.3.x"
   }

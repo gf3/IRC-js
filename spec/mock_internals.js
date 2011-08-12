@@ -1,7 +1,5 @@
 var util = require( 'util' )
   , events = require( 'events' )
-  , mockInternals
-  , mockSocket
 
 // Mock Stream
 function MockSocket () {
@@ -14,11 +12,11 @@ MockSocket.prototype.output = []
 MockSocket.prototype.write = function ( data ) { this.output.push( data ) }
 MockSocket.prototype.setEncoding = function ( e ) { this.encoding = e }
 MockSocket.prototype.setTimeout = function ( t ) { this.timeout = t }
-MockSocket.prototype.connect = function () { console.log( 'Socket connected.' ) }
-MockSocket.prototype.end = function () { console.log( 'Socket was ended.' ) }
+MockSocket.prototype.connect = function () { this.mockConnected = true }
+MockSocket.prototype.end = function () { this.mockEnded = true }
 
 // Mock  Internals
-mockInternals = 
+module.exports = 
   { buffer: ''
   , connected: false
   , privmsg_queue: []
@@ -27,7 +25,6 @@ mockInternals =
   , cache: {}
   , locks: {}
   , emitter: new events.EventEmitter()
-  , socket: mockSocket new MockSocket()
+  , socket: new MockSocket()
   }
 
-module.exports = mockInternals
