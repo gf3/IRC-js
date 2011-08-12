@@ -10,7 +10,7 @@ Person          ← Nick User? Host? S
 
 Nick            ← ( AlphaNum / SquareBrackets / CurlyBrackets / Backtick / [ _ - ^ | \ ] )+
 
-User            ← "!" ( AlphaNum / SquareBrackets / [ _ - = . ~ ^ \ ` ] )+
+User            ← "!" ( AlphaNum / SquareBrackets / [ _ - = . | ~ ^ \ ` ] )+
 
 Host            ← "@" ( AlphaNum / SquareBrackets / [ _ - . | : / ] )+
 
