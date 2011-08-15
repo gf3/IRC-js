@@ -243,19 +243,42 @@ exports[ 'IRC#privmsg should send basic messages' ] = function ( test ) {
 
 exports[ 'IRC#privmsg should do nothing if the message is an empty string' ] = function ( test ) {
   test.numAssertions = 1
-  test.ok( false, "Pending" )
+
+  helper.bot.privmsg( '#asl', '' )
+  test.equal( helper.MockInternals.socket.output.length, 0 )
+
   done( test )
 }
 
 exports[ 'IRC#privmsg should split long messages into multiple messages' ] = function ( test ) {
   test.numAssertions = 1
-  test.ok( false, "Pending" )
+
+  var msg = new Array( 1200 ).join( 'x' )
+  helper.bot.privmsg( '#asl', msg )
+  test.equal( helper.MockInternals.socket.output.length, 3 )
+
   done( test )
 }
 
-exports[ 'IRC#privmsg should use flood protection when instructed' ] = function ( test ) {
+// exports[ 'IRC#privmsg should use flood protection when instructed' ] = function ( test ) {
+  // test.numAssertions = 2
+
+  // var msg = new Array( 5000 ).join( 'x' )
+  // helper.bot.privmsg( '#asl', msg, true )
+  // test.equal( helper.MockInternals.socket.output.length, 1 )
+
+  // setTimeout( function() {
+    // test.equal( helper.MockInternals.socket.output.length, 5 )
+    // done( test )
+  // }, 1000 )
+// }
+
+exports[ 'IRC#notice should notice a channel' ] = function ( test ) {
   test.numAssertions = 1
-  test.ok( false, "Pending" )
+
+  helper.bot.notice( '#asl', 'going down' )
+  test.equal( helper.MockInternals.socket.output[0], "NOTICE #asl :going down\r\n" )
+
   done( test )
 }
 
