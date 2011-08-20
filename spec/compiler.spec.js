@@ -67,6 +67,12 @@ exports[ 'Can parse users with backticks' ] = function( test ) { var m
   test.finish()
 }
 
+exports[ 'Can parse users with pipe' ] = function( test ) { var m
+  m = Compiler.compile( ':|RicharD|!~|RicharD|@93-41-181-86.ip82.fastwebnet.it PRIVMSG #jquery :I want do a simple login with error\r\n' )
+  test.equal( '~|RicharD|', m.person.user )
+  test.finish()
+}
+
 exports[ 'Can parse multiple middle params properly' ] = function( test ) { var m
   m = Compiler.compile( ':irc.server 353 nick = #chan :nick nick2\r\n' )
   test.equal( 'nick', m.params[0] )
