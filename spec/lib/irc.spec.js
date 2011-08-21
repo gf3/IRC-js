@@ -282,6 +282,16 @@ exports[ 'IRC#notice should notice a channel' ] = function ( test ) {
   done( test )
 }
 
+exports[ 'IRC should emit all events as a `*` with the command as the first parameter ' ] = function ( test ) {
+  test.numAssertions = 1
+
+  helper.bot.on( '*', function ( type, message ) {
+    test.equal( type, 'join' )
+    done( test )
+  })
+  helper.MockInternals.socket.emit( 'data', ":Hornet!~hornet@cpc3-ipsw1-0-0-cust381.5-4.cable.virginmedia.com JOIN :#prototype\r\n" )
+}
+
 /*------------------------------------*\
     Util
 \*------------------------------------*/
