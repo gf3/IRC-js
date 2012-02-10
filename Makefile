@@ -1,6 +1,7 @@
 # Macro Definitions
 CTAGS= jsctags
 NODE= node
+MOCHA= ./node_modules/mocha/bin/mocha
 
 # Explicit Rules
 tags:
@@ -10,4 +11,4 @@ parser:
 	$(NODE) util/generate.js
 
 test:
-	$(NODE) spec/lib/*.js -a
+	$(MOCHA) --reporter spec --globals names --require should spec/lib/*.js
