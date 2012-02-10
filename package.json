@@ -9,10 +9,10 @@
   , "Nathan Rajlich <nathan@tootallnate.net> (http://tootallnate.net)"
   ]
 , "homepage" : "http://gf3.github.com/IRC-js/"
-, "version" : "0.2.27"
+, "version" : "2.0.0-beta"
 , "main" : "./lib/irc"
 , "directories" : { "lib" : "./lib", "node_libraries" : "./node_libraries" }
-, "engines" : [ "node >=0.2.0" ]
+, "engines" : [ "node >=0.4.0" ]
 , "dependencies" :
   { "PanPG": "0.0.9"
   }
