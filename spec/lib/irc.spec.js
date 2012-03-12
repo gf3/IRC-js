@@ -2,6 +2,10 @@ IRCExposeInternals = true
 
 var MI = require( __dirname + '/../mock_internals' )
   , IRC = require( __dirname + '/../../lib/irc' )
+  , constants = require ( __dirname + '/../../lib/constants' )
+  , CMD = constants.CMD
+  , EVT = constants.EVT
+  , RPL = constants.RPL
 // , helper = require( __dirname + '/../spec_helper' )
 
 // helper.bot.options.log = false
@@ -192,8 +196,8 @@ describe( 'IRC', function(){
       withHelper( function( h ){
 
         h.bot.topic( "#asl", function( c, t ) {
-          "#asl".should.equal( c )
-          "oh hai".should.equal( t )
+          c.should.equal( "#asl" )
+          t.should.equal( ":oh hai" )
           done()
         })
 
@@ -208,10 +212,10 @@ describe( 'IRC', function(){
       withHelper( function( h ){
 
         h.bot.names( "#asl", function( c, n ) {
-          "#asl".should.equal( c )
-          "one".should.equal( n[0] )
-          "two".should.equal( n[1] )
-          "three".should.equal( n[2] )
+          c.should.equal( "#asl" )
+          n[0].should.equal( ":one" )
+          n[1].should.equal( "two" )
+          n[2].should.equal( "three" )
           done()
         })
 
@@ -260,9 +264,9 @@ describe( 'IRC', function(){
     it( 'should query the server for version information', function( done ) {
       withHelper( function( h ){
         h.bot.version( function( v ) {
-          "one".should.equal( v[0] )
-          "two".should.equal( v[1] )
-          "longer message".should.equal( v[2] )
+          v[0].should.equal( "one" )
+          v[1].should.equal( "two" )
+          v[2].should.equal( ":longer message" )
           done()
         })
 
@@ -333,11 +337,11 @@ describe( 'IRC', function(){
     })
   })
 
-  it( 'IRC should emit all events as a `*` with the command as the first parameter ', function( done ) {
+  it( 'IRC should emit all events as a `' + EVT.ANY + '` event with the command as the first parameter ', function( done ) {
     withHelper( function( h ){
 
-      h.bot.on( '*', function ( type, message ) {
-        type.should.equal( 'join' )
+      h.bot.on( EVT.ANY, function ( type, message ) {
+        type.should.equal( CMD.JOIN )
         done()
       })
 
