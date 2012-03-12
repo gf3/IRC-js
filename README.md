@@ -10,7 +10,6 @@ An IRC library for node.js
 
 ## Tests
 
-Tests are written with [async_testing](http://github.com/bentomas/node-async-testing), install `node install async_testing`. Run via:
 
-    node spec/*.js
+    make test
 
