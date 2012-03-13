@@ -1,0 +1,38 @@
+{  "//"  : "Whether the bot should crash and burn on errors or not"
+,  "die" : false
+
+,  "//" : "Text encoding to use, used for decoding incoming messages"
+,  "//" : "as well as encoding outgoing messages"
+,  "encoding" : "utf8"
+
+,  "//" : "Prevent sending lots of stuff in rapid succession"
+,  "flood-protection" : false
+
+,  "//"  : "Log all messages"
+,  "log" : true
+
+,  "//"   : "Bot nickname"
+,  "nick" : "basic-irc-js-bot"
+
+,  "//" : "Server settings"
+,  "server" :
+
+  {  "//" : "IRC server address"
+  ,  "address" : "chat.freenode.net"
+
+  ,  "//"   : "IRC server port"
+  ,  "port" : 6667
+
+  ,  "//"  : "Connect using the Secure Sockets Layer protocol"
+  ,  "ssl" : false
+  }
+
+,  "//" : "User settings, i.e how the bot represents itself to the server and other clients"
+,  "user" :
+
+  {  "hostname"   : "interhost"
+  ,  "realname"   : "IRC-JS Bot"
+  ,  "servername" : "intertube"
+  ,  "username"   : "irc-js"
+  }
+}

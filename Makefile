@@ -1,7 +1,8 @@
 # Macro Definitions
-CTAGS= jsctags
-NODE= node
-MOCHA= ./node_modules/mocha/bin/mocha
+CTAGS = jsctags
+NODE  = node
+MOCHA = ./node_modules/mocha/bin/mocha
+
 
 # Explicit Rules
 tags:
@@ -11,4 +12,5 @@ parser:
 	$(NODE) util/generate.js
 
 test:
+	export IRCJS_MOCK_INTERNALS=1;\
 	$(MOCHA) --reporter spec --globals names --require should spec/lib/*.js

@@ -1,0 +1,17 @@
+NonTerminating  ← [^ U+000A U+000D ]
+
+SquareBrackets  ← [ [ U+005D ]
+
+CurlyBrackets   ← [ { } ]
+
+Backtick        ← [ U+0060 ]
+
+AlphaNum        ← ( Letter / Num )
+
+Letter          ← [ a-z A-Z ]
+
+Num             ← [ 0-9 ]
+
+CRLF            ← [ U+000D ] [ U+000A ]
+
+S               ← [ U+0020 ]+

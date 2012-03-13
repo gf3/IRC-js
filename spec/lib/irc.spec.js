@@ -1,268 +1,267 @@
-IRCExposeInternals = true
+const format  = require( "util" ).format
+    , path    = require( "path" )
+    , libPath = path.join( __dirname, "..", "..", "lib" )
+    , MI      = require( path.join( libPath, "..", "spec", "mock_internals" ) )
+    , IRC     = require( path.join( libPath, "irc" ) )
+    , cs      = require( path.join( libPath, "constants" ) )
+    , COMMAND = cs.COMMAND
+    , EVENT   = cs.EVENT
+    , REPLY   = cs.REPLY
+    , MODE    = cs.MODE
 
-var MI = require( __dirname + '/../mock_internals' )
-  , IRC = require( __dirname + '/../../lib/irc' )
-  , constants = require ( __dirname + '/../../lib/constants' )
-  , CMD = constants.CMD
-  , EVT = constants.EVT
-  , RPL = constants.RPL
-// , helper = require( __dirname + '/../spec_helper' )
+describe( "IRC", function() {
+  describe( "send", function() {
+    it( "should append \"\\r\\n\" if not present", function( done ) {
+      withHelper( function( h ) {
 
-// helper.bot.options.log = false
-// helper.bot.connect()
+        h.bot.send( "NO U" )
+        h.mockInternals.socket.output[0].should.equal( "NO U\r\n" )
 
-describe( 'IRC', function(){
-  describe( '#raw', function(){
-    it( 'should append "\\r\\n" if not present', function( done ) {
-      withHelper( function( h ){
-
-        h.bot.raw( "NO U" )
-        h.MockInternals.socket.output[0].should.equal( "NO U\r\n" )
-
-        h.bot.raw( "RAWR\r\n" )
-        h.MockInternals.socket.output[1].should.equal( "RAWR\r\n" )
+        h.bot.send( "RAWR\r\n" )
+        h.mockInternals.socket.output[0].should.equal( "RAWR\r\n" )
 
         done()
       })
     })
 
-    it( 'should truncate messages to 512 chars (including "\\r\\n")', function( done ) {
-      withHelper( function( h ){
+    it( "should truncate messages to 512 chars (including \"\\r\\n\")", function( done ) {
+      withHelper( function( h ) {
 
-        var longAssString = Array( 1024 ).join( '*' )
-        h.bot.raw( longAssString )
-        h.MockInternals.socket.output[0].length.should.equal( 512 )
-
-        done()
-      })
-    })
-  })
-
-  describe( '#pass', function(){
-    it( 'should send the server password', function( done ) {
-      withHelper( function( h ){
-
-        h.bot.pass( 'pewpew' )
-        h.MockInternals.socket.output[0].should.equal( "PASS pewpew\r\n" )
+        const longAssString = Array( 1024 ).join( "*" )
+        h.bot.send( longAssString )
+        h.mockInternals.socket.output[0].length.should.equal( 512 )
 
         done()
       })
     })
   })
 
-  describe( '#nick', function(){
-    it( 'should change the nickname', function( done ) {
-      withHelper( function( h ){
+  describe( "#connect", function() {
+    it( "should send the server password, if provided, on connect", function( done ) {
+      withHelper( function( h ) {
+
+        h.mockInternals.socket.output[2].should.equal( "PASS asd123\r\n" )
+
+        done()
+      })
+    })
+  })
+
+  describe( "#nick", function() {
+    it( "should change the nickname", function( done ) {
+      withHelper( function( h ) {
 
         // No prev nick
-        h.bot.nick( 'pewpew' )
-        h.MockInternals.socket.output[0].should.equal( "NICK pewpew\r\n" )
+        h.bot.nick( "pewpew" )
+        h.mockInternals.socket.output[0].should.equal( "NICK pewpew\r\n" )
 
         // Prev nick
-        h.MockInternals.nick = 'pewpew'
-        h.bot.nick( 'wepwep' )
-        h.MockInternals.socket.output[1].should.equal( ":" + h.MockInternals.nick + " NICK wepwep\r\n" )
+        // TODO ask gf3 about this, can't find anything about it in the RFC
+        //h.mockInternals.nick = "pewpew"
+        //h.bot.nick( "wepwep" )
+        //h.mockInternals.socket.output[0].should.equal( ":" + h.mockInternals.nick + " NICK wepwep\r\n" )
 
         done()
       })
     })
   })
 
-  describe( '#user', function(){
-    it( 'should send the user information with the correct modes', function( done ) {
-      withHelper( function( h ){
+  describe( "#user", function() {
+    it( "should send the user information with the correct modes", function( done ) {
+      withHelper( function( h ) {
+        const m = MODE.USER
 
-        h.bot.user( 'user', true, true, 'User Name' )
-        h.MockInternals.socket.output[0].should.equal( "USER user 12 * :User Name\r\n" )
+        h.bot.user( "user", "User Name", m.WALLOPS | m.INVISIBLE )
+        h.mockInternals.socket.output[0].should.equal( "USER user 12 * :User Name\r\n" )
 
-        h.bot.user( 'user', true, false, 'User Name' )
-        h.MockInternals.socket.output[1].should.equal( "USER user 4 * :User Name\r\n" )
+        h.bot.user( "user", "User Name", m.WALLOPS )
+        h.mockInternals.socket.output[0].should.equal( "USER user 4 * :User Name\r\n" )
 
-        h.bot.user( 'user', false, true, 'User Name' )
-        h.MockInternals.socket.output[2].should.equal( "USER user 8 * :User Name\r\n" )
+        h.bot.user( "user", "User Name", m.INVISIBLE )
+        h.mockInternals.socket.output[0].should.equal( "USER user 8 * :User Name\r\n" )
 
-        h.bot.user( 'user', false, false, 'User Name' )
-        h.MockInternals.socket.output[3].should.equal( "USER user 0 * :User Name\r\n" )
+        h.bot.user( "user", "User Name" )
+        h.mockInternals.socket.output[0].should.equal( "USER user 0 * :User Name\r\n" )
 
         done()
       })
     })
   })
 
-  describe( '#oper', function(){
+  describe( '#oper', function() {
     it( 'should send the operator information', function( done ) {
-      withHelper( function( h ){
+      withHelper( function( h ) {
 
         h.bot.oper( 'user', 'password' )
-        h.MockInternals.socket.output[0].should.equal( "OPER user password\r\n" )
+        h.mockInternals.socket.output[0].should.equal( "OPER user password\r\n" )
 
         done()
       })
     })
   })
 
-  describe( '#quit', function(){
+  describe( '#quit', function() {
     it( 'should quit with an optional message', function( done ) {
-      withHelper( function( h ){
+      withHelper( function( h ) {
 
         h.bot.quit()
-        h.MockInternals.socket.output[0].should.equal( "QUIT\r\n" )
+        h.mockInternals.socket.output[0].should.equal( "QUIT\r\n" )
 
         h.bot.quit("LOL BAI" )
-        h.MockInternals.socket.output[1].should.equal( "QUIT :LOL BAI\r\n" )
+        h.mockInternals.socket.output[0].should.equal( "QUIT :LOL BAI\r\n" )
 
         done()
       })
     })
 
     it( 'should disconnect and end the socket', function( done ) {
-      withHelper( function( h ){
+      withHelper( function( h ) {
 
         h.bot.quit()
-        h.MockInternals.socket.mockEnded.should.be.ok
+        h.mockInternals.socket.mockEnded.should.be.ok
 
         done()
       })
     })
   })
 
-  describe( '#join', function(){
+  describe( '#join', function() {
     it( 'should join both public and protected channels', function( done ) {
-      withHelper( function( h ){
+      withHelper( function( h ) {
 
         h.bot.join( "#asl" )
-        h.MockInternals.socket.output[0].should.equal( "JOIN #asl\r\n" )
+        h.mockInternals.socket.output[0].should.equal( "JOIN #asl\r\n" )
 
         h.bot.join( "#asl", "secret" )
-        h.MockInternals.socket.output[1].should.equal( "JOIN #asl secret\r\n" )
+        h.mockInternals.socket.output[0].should.equal( "JOIN #asl secret\r\n" )
 
         done()
       })
     })
   })
 
-  describe( '#part', function(){
+  describe( '#part', function() {
     it( 'should leave the channel', function( done ) {
-      withHelper( function( h ){
+      withHelper( function( h ) {
 
         h.bot.part( "#asl" )
-        h.MockInternals.socket.output[0].should.equal( "PART #asl\r\n" )
+        h.mockInternals.socket.output[0].should.equal( "PART #asl\r\n" )
 
         done()
       })
     })
   })
 
-  describe( '#channelMode', function(){
+  describe( '#channelMode', function() {
     it( 'IRC#channelMode should set various modes', function( done ) {
-      withHelper( function( h ){
+      withHelper( function( h ) {
 
         h.bot.channelMode( "#asl", "+im" )
-        h.MockInternals.socket.output[0].should.equal( "MODE #asl +im\r\n" )
+        h.mockInternals.socket.output[0].should.equal( "MODE #asl +im\r\n" )
 
         h.bot.channelMode( "#asl", "+b", "wat" )
-        h.MockInternals.socket.output[1].should.equal( "MODE #asl +b wat\r\n" )
+        h.mockInternals.socket.output[0].should.equal( "MODE #asl +b wat\r\n" )
 
         done()
       })
     })
   })
 
-  describe( '#userMode', function(){
+  describe( '#userMode', function() {
     it( 'IRC#userMode should set various modes on the current user', function( done ) {
-      withHelper( function( h ){
+      withHelper( function( h ) {
 
-        h.MockInternals.nick = 'pewpew'
+        h.mockInternals.nick = "pewpew"
         h.bot.userMode( "-o" )
-        h.MockInternals.socket.output[0].should.equal( ":" + h.MockInternals.nick + " MODE -o\r\n" )
+        h.mockInternals.socket.output[0].should.equal( "MODE " + h.mockInternals.nick + " -o\r\n" )
 
         done()
       })
     })
   })
 
-  describe( '#topic', function(){
+  describe( '#topic', function() {
     it( 'should set the topic for a given channel', function( done ) {
-      withHelper( function( h ){
+      withHelper( function( h ) {
 
         h.bot.topic( "#asl", "oh hai" )
-        h.MockInternals.socket.output[0].should.equal( "TOPIC #asl :oh hai\r\n" )
+        h.mockInternals.socket.output[0].should.equal( "TOPIC #asl :oh hai\r\n" )
 
         done()
       })
     })
 
     it( 'should get the topic for a given channel', function( done ) {
-      withHelper( function( h ){
+      withHelper( function( h ) {
 
         h.bot.topic( "#asl", function( c, t ) {
           c.should.equal( "#asl" )
-          t.should.equal( ":oh hai" )
+          t.should.equal( "oh hai" )
           done()
         })
 
-        h.MockInternals.socket.output[0].should.equal( "TOPIC #asl\r\n" )
-        h.MockInternals.socket.emit( 'data', ':the.server.com 332 js-irc #asl :oh hai\r\n' )
+        h.mockInternals.socket.output[0].should.equal( "TOPIC #asl\r\n" )
+        h.mockInternals.socket.emit( 'data', ':the.server.com 332 js-irc #asl :oh hai\r\n' )
       })
     })
   })
 
-  describe( '#names', function(){
+  describe( '#names', function() {
     it( 'should get the names for a given channel', function( done ) {
-      withHelper( function( h ){
+      withHelper( function( h ) {
 
         h.bot.names( "#asl", function( c, n ) {
           c.should.equal( "#asl" )
-          n[0].should.equal( ":one" )
+          n[0].should.equal( "one" )
           n[1].should.equal( "two" )
           n[2].should.equal( "three" )
           done()
         })
 
-        h.MockInternals.socket.output[0].should.equal( "NAMES #asl\r\n" )
-        h.MockInternals.socket.emit( 'data', ':the.server.com 353 js-irc = #asl :one two three\r\n' )
+        h.mockInternals.socket.output[0].should.equal( "NAMES #asl\r\n" )
+        h.mockInternals.socket.emit( 'data', ':the.server.com 353 js-irc = #asl :one two three\r\n' )
       })
     })
 
     it( 'should queue up successive calls' )
   })
 
-  describe( '#list', function(){
+  describe( '#list', function() {
     it( 'should get the information for a given channel' )
 
     it( 'should get the information for all channels on a server' )
   })
 
-  describe( '#invite', function(){
+  describe( '#invite', function() {
     it( 'should invite a user to a given channel', function( done ) {
-      withHelper( function( h ){
+      withHelper( function( h ) {
 
         h.bot.invite( "user", "#asl" )
-        h.MockInternals.socket.output[0].should.equal( "INVITE user #asl\r\n" )
+        h.mockInternals.socket.output[0].should.equal( "INVITE user #asl\r\n" )
 
         done()
       })
     })
   })
 
-  describe( '#kick', function(){
+  describe( '#kick', function() {
     it( 'should kick a user from a given channel', function( done ) {
-      withHelper( function( h ){
+      withHelper( function( h ) {
 
         h.bot.kick( "#asl", "user" )
-        h.MockInternals.socket.output[0].should.equal( "KICK #asl user\r\n" )
+        h.mockInternals.socket.output[0].should.equal( "KICK #asl user\r\n" )
 
         h.bot.kick( "#asl", "user", "kk bai" )
-        h.MockInternals.socket.output[1].should.equal( "KICK #asl user :kk bai\r\n" )
+        h.mockInternals.socket.output[0].should.equal( "KICK #asl user :kk bai\r\n" )
 
         done()
       })
     })
   })
 
-  describe( '#version', function(){
+  describe( '#version', function() {
     it( 'should query the server for version information', function( done ) {
-      withHelper( function( h ){
+      withHelper( function( h ) {
         h.bot.version( function( v ) {
           v[0].should.equal( "one" )
           v[1].should.equal( "two" )
@@ -270,51 +269,52 @@ describe( 'IRC', function(){
           done()
         })
 
-        h.MockInternals.socket.output[0].should.equal( "VERSION\r\n" )
-        h.MockInternals.socket.emit( 'data', ':the.server.com 351 js-irc one two :longer message\r\n' )
+        h.mockInternals.socket.output[0].should.equal( "VERSION\r\n" )
+        h.mockInternals.socket.emit( 'data', ':the.server.com 351 js-irc one two :longer message\r\n' )
       })
     })
   })
 
-  describe( '#privmsg', function(){
+  describe( '#privmsg', function() {
     it( 'should send basic messages', function( done ) {
-      withHelper( function( h ){
+      withHelper( function( h ) {
 
         h.bot.privmsg( '#asl', 'hey sup everyone?' )
-        h.MockInternals.socket.output[0].should.equal( "PRIVMSG #asl :hey sup everyone?\r\n" )
+        h.mockInternals.socket.output[0].should.equal( "PRIVMSG #asl :hey sup everyone?\r\n" )
 
         done()
       })
     })
 
-    it( 'should do nothing if the message is an empty string', function( done ) {
-      withHelper( function( h ){
+    it( "should do nothing if the message is an empty string", function( done ) {
+      withHelper( function( h ) {
+        const before = h.mockInternals.socket.output.length
 
-        h.bot.privmsg( '#asl', '' )
-        h.MockInternals.socket.output.length.should.equal( 0 )
+        h.bot.privmsg( "#asl", "" )
+        h.mockInternals.socket.output.length.should.equal( before )
 
         done()
       })
     })
 
-    it( 'should split long messages into multiple messages', function( done ) {
-      withHelper( function( h ){
-
-        var msg = new Array( 1200 ).join( 'x' )
-        h.bot.privmsg( '#asl', msg )
-        h.MockInternals.socket.output.length.should.equal( 3 )
+    it( "should split long messages into multiple messages", function( done ) {
+      withHelper( function( h ) {
+        const msg = new Array( 1200 ).join( "x" )
+            , before = h.mockInternals.socket.output.length
+        h.bot.privmsg( "#asl", msg )
+        h.mockInternals.socket.output.length.should.equal( before + 3 )
 
         done()
       })
     })
 
     // it( 'should use flood protection when instructed', function( done ) {
-      // withHelper( function( h ){
+      // withHelper( function( h ) {
 
-        // var msg = new Array( 5000 ).join( 'x' )
+        // const msg = new Array( 5000 ).join( 'x' )
         // h.bot.privmsg( '#asl', msg, true )
-        // h.MockInternals.socket.output.length.should.equal( 1 )
-        // var d = h
+        // h.mockInternals.socket.output.length.should.equal( 1 )
+        // const d = h
 
         // setTimeout( function() {
           // ;;; console.log( "\n\n\n", d.MockInternals.socket.output, "\n\n\n" )
@@ -325,43 +325,42 @@ describe( 'IRC', function(){
     // })
   })
 
-  describe( '#notice', function(){
+  describe( '#notice', function() {
     it( 'should notice a channel', function( done ) {
-      withHelper( function( h ){
+      withHelper( function( h ) {
 
         h.bot.notice( '#asl', 'going down' )
-        h.MockInternals.socket.output[0].should.equal( "NOTICE #asl :going down\r\n" )
+        h.mockInternals.socket.output[0].should.equal( "NOTICE #asl :going down\r\n" )
 
         done()
       })
     })
   })
 
-  it( 'IRC should emit all events as a `' + EVT.ANY + '` event with the command as the first parameter ', function( done ) {
-    withHelper( function( h ){
+  it( format( "should emit all events as a `%s` event with the command as the first parameter", EVENT.ANY ), function( done ) {
+    withHelper( function( h ) {
 
-      h.bot.on( EVT.ANY, function ( type, message ) {
-        type.should.equal( CMD.JOIN )
+      h.bot.on( EVENT.ANY, function( type, message ) {
+        type.should.equal( COMMAND.JOIN )
         done()
       })
 
-      h.MockInternals.socket.emit( 'data', ":Hornet!~hornet@cpc3-ipsw1-0-0-cust381.5-4.cable.virginmedia.com JOIN :#prototype\r\n" )
+      h.mockInternals.socket.emit( "data", ":Hornet!~hornet@cpc3-ipsw1-0-0-cust381.5-4.cable.virginmedia.com JOIN :#prototype\r\n" )
     })
   })
 
 })
 
-/*------------------------------------*\
-Util
-\*------------------------------------*/
-function withHelper ( test ) {
-  var mi = new MI
+/**
+ * @param {!function} test
+ */
+function withHelper( test ) {
+  const mi  = new MI
+      , bot = new IRC({ _internal: mi, log: false, password: "asd123" })
   mi.resetNetwork()
 
-  var bot = new IRC({ _internal: mi, log: false })
-  bot.on( 'connected', function(){
-    mi.socket.output = []
-    test.call( null, { bot: bot, MockInternals: mi } )
+  bot.on( EVENT.CONNECT, function() {
+    test.call( null, { bot: bot, mockInternals: mi } )
   })
   bot.connect()
 }
