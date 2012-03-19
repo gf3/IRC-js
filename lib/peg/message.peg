@@ -1,9 +1,0 @@
-Message   ← Prefix? Command Params? CRLF
-
-Command   ← ( Letter+ / Num{3} )
-
-Params    ← S Middle* Trailing?
-
-Middle    ← ( !":" !S NonTerminating )+ S?
-
-Trailing  ← ":" ( NonTerminating / S )*

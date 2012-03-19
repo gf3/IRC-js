@@ -1,7 +1,0 @@
-Mode         ← ( ( "+" / "-" ) Flag* )*
-
-Flag         ← ChannelFlag / UserFlag
-
-ChannelFlag  ← ( "a" / "i" / "m" / "n" / "p" / "q" / "r" / "s" / "t" / "b" / "O" / "e" / "I" / "k" / "l" / "k" / "v" )
-
-UserFlag     ← ( "a" / "i" / "O" / "o" / "r" / "s" / "w" )

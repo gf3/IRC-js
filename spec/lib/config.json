@@ -1,0 +1,41 @@
+{ "//" : "This is the default configuration file"
+, "//" : "Copy it to your bot and adapt"
+
+, "//"  : "Should the bot crash and burn on errors?"
+, "die" : true
+
+, "//"       : "The encoding which the bot should use"
+, "encoding" : "ascii"
+
+, "//"               : "Prevent sending lots of stuff in rapid succession"
+, "flood-protection" : false
+
+, "//"  : "Log all messages"
+, "log" : false
+
+, "//"   : "Bot nickname"
+, "nick" : "irc-js"
+
+, "//"     : "Server settings"
+, "server" :
+
+  { "//"      : "IRC server address"
+  , "address" : "chat.freenode.net"
+
+  , "//"   : "IRC server port"
+  , "port" : 6667
+
+  , "//"  : "Connect using the Secure Sockets Layer protocol"
+  , "ssl" : false
+  }
+
+, "//"   : "How the bot presents itself to the server and other clients"
+, "user" :
+
+  { "hostname" : "internet"
+  , "mode"     : "+iw"
+  , "password" : "asd123"
+  , "realname" : "Botty McIRC"
+  , "username" : "irc-js"
+  }
+}

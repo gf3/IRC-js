@@ -6,11 +6,8 @@ MOCHA = ./node_modules/mocha/bin/mocha
 
 # Explicit Rules
 tags:
-	$(CTAGS) lib/irc.js lib/compiler.js lib/walker.js spec/**/*.js
-
-parser:
-	$(NODE) util/generate.js
+	$(CTAGS) lib/irc.js lib/parser.js spec/**/*.js
 
 test:
-	export IRCJS_MOCK_INTERNALS=1;\
+	export IRCJS_TEST=1;\
 	$(MOCHA) --reporter spec --globals names --require should spec/lib/*.js

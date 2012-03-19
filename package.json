@@ -13,12 +13,6 @@
 , "main" : "./lib/irc"
 , "directories" : { "lib" : "./lib", "node_libraries" : "./node_libraries" }
 , "engines" : [ "node >=0.4.0" ]
-, "dependencies" :
-  { "PanPG": "0.0.9"
-  }
-, "bundledDependencies" :
-  [ "PanPG"
-  ]
 , "devDependencies" :
   { "mocha": ">=0.12.0"
   , "should": ">=0.5.1"
