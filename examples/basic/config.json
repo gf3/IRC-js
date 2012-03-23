@@ -2,7 +2,7 @@
 , "encoding" : "ascii"
 , "flood-protection" : false
 , "log" : true
-, "nick" : "dm5000"
+, "nick" : "basicbotjs"
 , "server" :
   { "address" : "chat.freenode.net"
   , "port" : 6667
