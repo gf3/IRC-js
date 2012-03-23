@@ -182,7 +182,7 @@ describe( "IRC", function() {
   })
 
   bit( f( "should emit all events as a `%s` event with message as first parameter", EVENT.ANY ), function( done ) {
-    this.once( EVENT.ANY, function( msg ) {
+    this.listenOnce( EVENT.ANY, function( msg ) {
       msg.command.should.equal( COMMAND.PRIVMSG )
       done() 
     })

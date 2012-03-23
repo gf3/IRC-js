@@ -1,5 +1,6 @@
 const f       = require( "util" ).format
     , path    = require( "path" )
+    , should  = require( "should" )
     , bit     = require( path.join( __dirname, "..", "helpers" ) ).bit
     , lib     = path.join( __dirname, "..", "..", "lib" )
     , IRC     = require( path.join( lib, "irc" ) )
@@ -37,19 +38,37 @@ describe( "objects", function() {
       })
     })
 
-    it( "should have a factory function supporting convenient signatures", function() {
-      o.message( COMMAND.LIST ).should.be.an.instanceof( o.Message )
-      o.message( COMMAND.JOIN, [ "#jquery" ] )
-        .should.be.an.instanceof( o.Message )
-      o.message( COMMAND.PRIVMSG, [ "#jquery", ": Hey" ] )
-        .should.be.an.instanceof( o.Message )
-      o.message( o.person( "lol" ), COMMAND.PRIVMSG, [ "#jquery", ": Hey" ] )
-        .should.be.an.instanceof( o.Message )
-    })
+    describe( "factory function", function() {
+      it( "should support convenient signatures", function() {
+        var m = o.message( COMMAND.LIST )
+        m.should.be.an.instanceof( o.Message )
+        m.command.should.equal( COMMAND.LIST )
+        should.equal( m.prefix, null )
+        m.params.should.eql( [] )
 
-    it( "should throw an error if factory function has no suitable signature", function() {
-      o.message.bind( null, 1, 2, 3, 4 ).should.throw( /signature/ )
-      o.message.bind( null ).should.throw( /signature/ )
+        m = o.message( COMMAND.JOIN, [ "#jquery" ] )
+        m.should.be.an.instanceof( o.Message )
+        m.command.should.equal( COMMAND.JOIN )
+        should.equal( m.prefix, null )
+        m.params.should.eql( [ "#jquery"] )
+
+        m = o.message( COMMAND.PRIVMSG, [ "#jquery", ": Hey" ] )
+        m.should.be.an.instanceof( o.Message )
+        m.command.should.equal( COMMAND.PRIVMSG )
+        should.equal( m.prefix, null )
+        m.params.should.eql( [ "#jquery", ": Hey" ] )
+
+        m = o.message( o.person( "lol" ), COMMAND.PRIVMSG, [ "#jquery", ": Hey" ] )
+        m.should.be.an.instanceof( o.Message )
+        m.command.should.equal( COMMAND.PRIVMSG )
+        m.prefix.should.eql( o.person( "lol" ) )
+        m.params.should.eql( [ "#jquery", ": Hey" ] )
+      })
+
+      it( "should throw an error if no suitable signature", function() {
+        o.message.bind( null, 1, 2, 3, 4 ).should.throw( /signature/ )
+        o.message.bind( null ).should.throw( /signature/ )
+      })
     })
   })
 
@@ -117,14 +136,29 @@ describe( "objects", function() {
         const chan = o.channel( "#awesome" ).with( this )
             , user = "gf3"
         chan.invite( user )
-        this._internal.socket.output[0].should.equal( f( "INVITE %s %s\r\n", chan, user ) )
+        this._internal.socket.output[0].should.equal( f( "INVITE %s %s\r\n", user, chan ) )
       })
 
       bit( "should invite Person objects", function() {
         const chan = o.channel( "#awesome" ).with( this )
             , user = o.person( "gf3", "lol", "omg" )
         chan.invite( user )
-        this._internal.socket.output[0].should.equal( f( "INVITE %s %s\r\n", chan, user.nick ) )
+        this._internal.socket.output[0].should.equal( f( "INVITE %s %s\r\n", user.nick, chan ) )
+      })
+    })
+
+    describe( "join", function() {
+      bit( "should join a Channel object", function() {
+        const chan = o.channel( "#joiners" ).with( this )
+        chan.join()
+        this._internal.socket.output[0].should.equal( f( "JOIN %s\r\n", chan.name ) )
+      })
+
+      bit( "should join a Channel object with a key", function() {
+        const chan = o.channel( "#keyjoin" ).with( this )
+            , key = "keymaster"
+        chan.join( key )
+        this._internal.socket.output[0].should.equal( f( "JOIN %s %s\r\n", chan.name, key ) )
       })
     })
 
@@ -153,43 +187,51 @@ describe( "objects", function() {
       })
     })
 
-    it( "should have a factory function supporting convenient signatures", function() {
-      o.channel( "lol" ).should.be.an.instanceof( o.Channel )
-    })
+    describe( "factory function", function() {
+      it( "should support convenient signatures", function() {
+        o.channel( "lol" ).should.be.an.instanceof( o.Channel )
+      })
 
-    it( "should throw an error if factory function has no suitable signature", function() {
-      o.channel.bind( null ).should.throw( /signature/ )
+      it( "should throw an error if no suitable signature", function() {
+        o.channel.bind( null ).should.throw( /signature/ )
+      })
     })
   })
 
   describe( "Person", function() {
-    it( "should serialize into its nick, user and host", function() {
-      const p = o.person( "anick", "auser", "ahost" )
-      p.toString().should.equal( "anick!auser@ahost" )
-      p.user = null
-      p.toString().should.equal( "anick@ahost" )
-      p.host = null
-      p.toString().should.equal( "anick" )
+    describe( "toString", function() {
+      it( "should serialize into its nick, user and host", function() {
+        const p = o.person( "anick", "auser", "ahost" )
+        p.toString().should.equal( "anick!auser@ahost" )
+        p.user = null
+        p.toString().should.equal( "anick@ahost" )
+        p.host = null
+        p.toString().should.equal( "anick" )
+      })
     })
 
-    bit( "should get kicked from a channel", function() {
-      const prsn = o.person( "ada", "u", "h" ).with( this )
-          , chan = o.channel( "#elitists" )
-      prsn.kickFrom( chan )
-      this._internal.socket.output[0].should.equal( f( "KICK %s %s\r\n", chan, prsn.nick ) )
+    describe( "kickFrom", function() {
+      bit( "should get kicked from a channel, by name or using a Channel object", function() {
+        const prsn = o.person( "ada", "u", "h" ).with( this )
+            , chan = o.channel( "#elitists" )
+        prsn.kickFrom( chan )
+        this._internal.socket.output[0].should.equal( f( "KICK %s %s\r\n", chan, prsn.nick ) )
 
-      prsn.kickFrom( "#elitists" )
-      this._internal.socket.output[0].should.equal( f( "KICK %s %s\r\n", chan, prsn.nick ) )
+        prsn.kickFrom( "#elitists" )
+        this._internal.socket.output[0].should.equal( f( "KICK %s %s\r\n", chan, prsn.nick ) )
+      })
     })
 
-    bit( "should get invited to a channel", function() {
-      const prsn = o.person( "gf3", "eh", "canada" ).with( this )
-          , chan = o.channel( "#america" )
-      prsn.inviteTo( chan )
-      this._internal.socket.output[0].should.equal( f( "INVITE %s %s\r\n", chan, prsn.nick ) )
+    describe( "inviteTo", function() {
+      bit( "should get invited to a channel, by name or Channel object", function() {
+        const prsn = o.person( "gf3", "eh", "canada" ).with( this )
+            , chan = o.channel( "#america" )
+        prsn.inviteTo( chan )
+        this._internal.socket.output[0].should.equal( f( "INVITE %s %s\r\n", prsn.nick, chan ) )
 
-      prsn.inviteTo( "#america" )
-      this._internal.socket.output[0].should.equal( f( "INVITE %s %s\r\n", chan, prsn.nick ) )
+        prsn.inviteTo( "#america" )
+        this._internal.socket.output[0].should.equal( f( "INVITE %s %s\r\n", prsn.nick, chan ) )
+      })
     })
 
     describe( "notify", function() {
@@ -201,15 +243,29 @@ describe( "objects", function() {
       })
     })
 
-    it( "should have a factory function supporting convenient signatures", function() {
-      o.person( "lol" ).should.be.an.instanceof( o.Person )
-      o.person( "lol", "omg" ).should.be.an.instanceof( o.Person )
-      o.person( "lol", "omg", "wtf" ).should.be.an.instanceof( o.Person )
-    })
+    describe( "factory function", function() {
+      it( "should support convenient signatures", function() {
+        var p = o.person( "lol" )
+        p.should.be.an.instanceof( o.Person )
+        p.nick.should.equal( "lol" )
+        should.not.exist( p.user )
+        should.not.exist( p.host )
+        p = o.person( "lol", "omg" )
+        p.should.be.an.instanceof( o.Person )
+        p.nick.should.equal( "lol" )
+        p.user.should.equal( "omg" )
+        should.not.exist( p.host )
+        p = o.person( "lol", "omg", "wtf" )
+        p.should.be.an.instanceof( o.Person )
+        p.nick.should.equal( "lol" )
+        p.user.should.equal( "omg" )
+        p.host.should.equal( "wtf" )
+      })
 
-    it( "should throw an error if factory function has no suitable signature", function() {
-      o.person.bind( null ).should.throw( /signature/ )
-      o.person.bind( null, 1, 2, 3, 4 ).should.throw( /signature/ )
+      it( "should throw an error if no suitable signature", function() {
+        o.person.bind( null ).should.throw( /signature/ )
+        o.person.bind( null, 1, 2, 3, 4 ).should.throw( /signature/ )
+      })
     })
   })
 })
