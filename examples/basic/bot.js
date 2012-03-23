@@ -31,7 +31,7 @@ const bot = new IRC( conf ).connect( function() {
 
 // Listen for a message matching a pattern, in this case something like `basicbotjs: ur an alligator`
 // with some fuzzy matching since people write in different ways. Those people...
-bot.listenFor( fmt( " *@?%s *:? *([Yy]ou(?:['’]?re)?|u(?: r)|ur?) +(.+)", bot.config.nick )
+bot.listenFor( fmt( " *@?%s *:? *(you(?:['’]?re)?|u(?: r)|ur?) +(.+)", bot.config.nick )
              , function( msg, you, remark ) {
   // Each group captured by the pattern is passed as an argument.
   // More capture groups, more arguments.
@@ -42,13 +42,14 @@ bot.listenFor( fmt( " *@?%s *:? *([Yy]ou(?:['’]?re)?|u(?: r)|ur?) +(.+)", bot.
 })
 
 // Automatically join a channel if invited.
+// For the command names, you can use the provided constans, or type one yourself.
 bot.addListener( "invite", function( msg ) {
   const chan = bot.channels.add( msg.params[1] )
   chan.say( fmt( "Thanks for inviting me, %s", msg.prefix.nick ) )
 })
 
 // Love ice cream.
-bot.listenFor( /\bice\b +cream\b/i
+bot.listenFor( /\bice +cream\b/i
              , function( msg ) { msg.reply( "I love ice cream." ) } )
 
 // Listen for various commands from bot's human overlords (for now...).
@@ -59,24 +60,24 @@ bot.listenFor( fmt( "@?%s[: ]+(?:quit|shutdown|die|disconnect) ?(.+)?", bot.conf
   bot.quit( partingWords )
 })
 
-bot.listenFor( fmt( "@?%s[: ]+(?:part|leave|gtfo) +([+!#&][^ ]+(.+)?)", bot.config.nick )
+bot.listenFor( fmt( "@?%s[: ]+(?:part|leave|gtfo)(?: +([+!#&][^ ]+))?(?: (.+))?", bot.config.nick )
              , function( msg, name, txt ) {
-  const chan = bot.channels.get( name )
+  const chan = bot.channels.get( name || msg.params[0] )
   if ( ! chan )
     return msg.reply( fmt( "I’m not in %s, so I can’t leave it.", name ) )
-  chan.part( txt ? txt.trim() : "Goodbye!" )
+  chan.part( txt ? txt.trim() : fmt( "%s told me to leave.", msg.prefix.nick ) )
   if ( chan.name !== msg.params[0] )
     msg.reply( fmt( "Ok, I have left %s.", chan.name ) )
 })
 
-bot.listenFor( fmt( "@?%s[: ]+(?:join|add) +([+!#&][^ ]+([^ ]+)?)", bot.config.nick )
+bot.listenFor( fmt( "@?%s[: ]+(?:join|add) +([+!#&][^ ]+)(?: +([^ ]+))?", bot.config.nick )
              , function( msg, name, key ) {
   const chan = bot.channels.get( name )
   if ( chan && chan.name === msg.params[0] )
-    return msg.reply( fmt( "Nice try, %s.", msg.prefix.nick ) )
+    return msg.reply( fmt( "I am already here, %s.", msg.prefix.nick ) )
   else if ( chan )
     return msg.reply( fmt( "I am already in %s, and I can prove it. The topic is as follows. %s"
                          , name, chan.topic || "Hmm, appears to be empty." ) )
-  msg.reply( fmt( "Joining %s%s", name, key ? fmt( ", using the key “%s”.", key ) : "." ) )
+  msg.reply( fmt( "Joining %s%s", name, key ? fmt( ", using key “%s”.", key ) : "." ) )
   bot.channels.add( name, key )
 })

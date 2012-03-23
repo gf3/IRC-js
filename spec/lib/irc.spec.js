@@ -12,6 +12,7 @@ const f       = require( "util" ).format
     , EVENT   = cs.EVENT
     , REPLY   = cs.REPLY
     , MODE    = cs.MODE
+    , color   = require( path.join( libPath, "color" ) )
 
 // Make sure config files are up to date
 const defaultConf = JSON.parse( fs.readFileSync( path.join( libPath, "config.json" ) ) )
@@ -155,11 +156,20 @@ describe( "IRC", function() {
       this.channels.get( chan ).name.should.equal( chan.name )
     })
 
-    bit( "should add people to its list of users", function() {
+    bit( "should add people to its list of users, for all relevant messages", function() {
       const chan = this.channels.add( "#midi" )
-      this._internal.socket.emit( "data", ":protobot!~protobot@lol.com JOIN #midi\r\n" )
+      // A specific user JOINs
+      this._internal.socket.emit( "data", f( ":protobot!~protobot@lol.com JOIN %s\r\n", chan ) )
       should.exist( chan.people.get( "protobot" ) )
       chan.people.get( "protobot" ).should.be.an.instanceof( o.Person )
+      // A name reply for a channel
+      this._internal.socket.emit( "data", f( ":niven.freenode.net 353 %s @ %s :some +different @nicks\r\n", conf.nick, chan ) )
+      should.exist( chan.people.get( "some" ) )
+      should.exist( chan.people.get( "different" ) )
+      should.exist( chan.people.get( "nicks" ) )
+      chan.people.get( "protobot" ).should.be.an.instanceof( o.Person )
+      chan.people.get( "different" ).should.be.an.instanceof( o.Person )
+      chan.people.get( "nicks" ).should.be.an.instanceof( o.Person )
     })
 
     bit( "should remove people from its list of users", function() {

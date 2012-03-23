@@ -18,6 +18,7 @@ const messages = readFixture( "messages.json" )
     , modes    = readFixture( "modes.json" )
     , prefixes = readFixture( "prefixes.json" )
     , channels = readFixture( "channels.json" )
+    , nicks    = readFixture( "nicks.json" )
 
 // Tests
 describe( "parser", function() {
@@ -168,6 +169,25 @@ describe( "parser", function() {
     it( "should throw error on bad channel names", function() {
       channels.bad.forEach( function( chan, ix ) {
         parser.channel.bind( null, chan, true ).should.throw( /parse/i )
+      })
+    })
+  })
+
+  describe( "nick", function() {
+    it( "should parse nicks and nick lists", function() {
+      var matches = parser.nick( "@hej" )
+      should.equal( matches, "hej" )
+      matches = parser.nick( "@hej,~hej" )
+      should.equal( matches, "hej" )
+      matches = parser.nick( "@hej,~grej", true )
+      , ["hej", "grej"].should.eql( matches )
+      nicks.good.forEach( function( n, ix ) {
+        const res = parser.nick( n )
+        should.exist( res )
+      })
+      nicks.bad.forEach( function( n, ix ) {
+        const res = parser.nick( n )
+        should.not.exist( res )
       })
     })
   })
