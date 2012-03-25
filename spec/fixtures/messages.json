@@ -35,4 +35,7 @@
   [ ":js-irc!n=js-irc JOIN :#runlevel6\r\n"
   , "utter nonsense"
   ]
+, "353":
+  [ ":card.freenode.net 353 dm5000 @ #nlogax :dm5000 nlogax\r\n"
+  ]
 }

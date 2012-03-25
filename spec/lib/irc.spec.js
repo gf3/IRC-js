@@ -2,20 +2,19 @@ const f       = require( "util" ).format
     , path    = require( "path" )
     , fs      = require( "fs" )
     , should  = require( "should" )
-    , libPath = path.join( __dirname, "..", "..", "lib" )
+    , lib     = path.join( __dirname, "..", "..", "lib" )
     , help    = require( path.join( __dirname, "..", "helpers" ) )
-    , o       = require( path.join( libPath, "objects" ) )
-    , cs      = require( path.join( libPath, "constants" ) )
+    , o       = require( path.join( lib, "objects" ) )
+    , cs      = require( path.join( lib, "constants" ) )
     , bit     = help.bit
     , conf    = help.conf
     , COMMAND = cs.COMMAND
     , EVENT   = cs.EVENT
     , REPLY   = cs.REPLY
     , MODE    = cs.MODE
-    , color   = require( path.join( libPath, "color" ) )
 
 // Make sure config files are up to date
-const defaultConf = JSON.parse( fs.readFileSync( path.join( libPath, "config.json" ) ) )
+const defaultConf = JSON.parse( fs.readFileSync( path.join( lib, "config.json" ) ) )
     , testingConf = JSON.parse( fs.readFileSync( path.join( __dirname, "config.json" ) ) )
     , exampleConf = JSON.parse( fs.readFileSync( path.join( __dirname, "..", "..", "examples", "basic", "config.json" ) ) )
     , noComments  = function( k ) { return k !== "//" } // :)
@@ -78,18 +77,24 @@ describe( "IRC", function() {
 
   describe( "quit", function() {
     bit( "should quit without a message", function() {
+      const sock = this._internal.socket
       this.quit()
-      this._internal.socket.output[0].should.equal( "QUIT\r\n" )
+      sock.output[0].should.equal( "QUIT\r\n" )
+      should.not.exist( this._internal.socket )
     })
 
     bit( "should quit with a message", function() {
+      const sock = this._internal.socket
       this.quit( "LOL BAI" )
-      this._internal.socket.output[0].should.equal( "QUIT :LOL BAI\r\n" )
+      sock.output[0].should.equal( "QUIT :LOL BAI\r\n" )
+      should.not.exist( this._internal.socket )
     })
 
     bit( "should disconnect and end the socket", function() {
+      const sock = this._internal.socket
       this.quit()
-      this._internal.socket.mockEnded.should.be.ok
+      sock.mockEnded.should.be.ok
+      should.not.exist( this._internal.socket )
     })
   })
 
@@ -105,21 +110,6 @@ describe( "IRC", function() {
     it( "should get the information for a given channel" )
 
     it( "should get the information for all channels on a server" )
-  })
-
-  describe( "version", function() {
-    return
-    bit( "should query the server for version information", function( done ) {
-      this.version( function( v ) {
-        v[0].should.equal( "one" )
-        v[1].should.equal( "two" )
-        v[2].should.equal( ":longer message" )
-        done()
-      })
-
-      this._internal.socket.output[0].should.equal( "VERSION\r\n" )
-      this._internal.socket.emit( 'data', ':the.server.com 351 js-irc one two :longer message\r\n' )
-    })
   })
 
   describe( "send", function() {
@@ -142,22 +132,35 @@ describe( "IRC", function() {
   })
 
   describe( "channels", function() {
-    bit( "should let you add channels by name", function() {
-      this.channels.add( "#midi" )
-      this.channels.contains( "#midi" ).should.equal( true )
+    bit( "should let you add channels by name", function( done ) {
+      const chan = this.channels.add( "#addchanname", function( ch ) {
+        this.channels.contains( ch.name ).should.equal( true )
+        this.channels.get( ch.name ).should.equal( chan )
+        ch.should.equal( chan )
+        done()
+      })
+      this.channels.contains( "#addchanname" ).should.equal( false )
+      this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.config.nick, chan ) )
+      this._internal.socket.emit( "data"
+        , f( ":card.freenode.net 353 %s @ %s :%s nlogax\r\n", this.config.nick, chan, this.config.nick ) )
     })
 
-    bit( "should let you add Channel objects", function() {
-      const chan = new o.Channel( "#midi" )
-      this.channels.add( chan )
-      this.channels.contains( "#midi" ).should.equal( true )
-      this.channels.get( "#midi" ).should.equal( chan )
-      this.channels.get( chan ).should.equal( chan )
-      this.channels.get( chan ).name.should.equal( chan.name )
+    bit( "should let you add Channel objects", function( done ) {
+      const chan = new o.Channel( "#addchanobj" )
+      this.channels.add( chan, function( ch ) {
+        this.channels.contains( "#addchanobj" ).should.equal( true )
+        this.channels.get( "#addchanobj" ).should.equal( chan )
+        this.channels.get( ch ).should.equal( chan )
+        done()
+      })
+      this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.config.nick, chan ) )
+      this._internal.socket.emit( "data"
+        , f( ":card.freenode.net 353 %s @ %s :%s nlogax\r\n", this.config.nick, chan, this.config.nick ) )
     })
 
     bit( "should add people to its list of users, for all relevant messages", function() {
-      const chan = this.channels.add( "#midi" )
+      return
+      const chan = this.channels.add( "#addpeople" )
       // A specific user JOINs
       this._internal.socket.emit( "data", f( ":protobot!~protobot@lol.com JOIN %s\r\n", chan ) )
       should.exist( chan.people.get( "protobot" ) )
@@ -167,34 +170,42 @@ describe( "IRC", function() {
       should.exist( chan.people.get( "some" ) )
       should.exist( chan.people.get( "different" ) )
       should.exist( chan.people.get( "nicks" ) )
-      chan.people.get( "protobot" ).should.be.an.instanceof( o.Person )
+      chan.people.get( "some" ).should.be.an.instanceof( o.Person )
       chan.people.get( "different" ).should.be.an.instanceof( o.Person )
       chan.people.get( "nicks" ).should.be.an.instanceof( o.Person )
     })
 
     bit( "should remove people from its list of users", function() {
-      const chan = this.channels.add( "#midi" )
+      const chan = this.channels.add( "#removepeople" )
+      this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.config.nick, chan ) )
       // Hit and run lol
-      this._internal.socket.emit( "data", ":protobot!~protobot@rogers.com JOIN #midi\r\n" )
-      this._internal.socket.emit( "data", ":protobot!~protobot@rogers.com PART #midi\r\n" )
-      should.not.exist( this.channels.get( "#midi" ).people.get( "protobot" ) )
+      this._internal.socket.emit( "data", ":protobot!~protobot@rogers.com JOIN #removepeople\r\n" )
+      this._internal.socket.emit( "data", ":protobot!~protobot@rogers.com PART #removepeople\r\n" )
+      should.not.exist( this.channels.get( "#removepeople" ).people.get( "protobot" ) )
     })
 
-    bit( "should create only one Person instance per user", function() {
-      this.channels.add( "#hiphop" )
-      this.channels.add( "#gardening" )
-      this._internal.socket.emit( "data", ":akahn!~ak@ahn.com JOIN #hiphop\r\n" )
-      this._internal.socket.emit( "data", ":akahn!~ak@ahn.com JOIN #gardening\r\n" )
-      this.channels.get( "#gardening" ).people.get( "akahn" )
-          .should.equal( this.channels.get( "#hiphop" ).people.get( "akahn" ) )
-      this.channels.get( "#hiphop" ).people.get( "akahn" ).should.equal( this._people["akahn"] )
+    bit( "should create only one Person instance per user", function( done ) {
+      const nick = "single"
+          , prefix = f( "%s!~omg@wtf.com", nick )
+          , c1 = this.channels.add( "#channelone" )
+          , c2 = this.channels.add( "#channeltwo"
+            , function( ch ) {
+              c1.people.get( nick ).should.equal( c2.people.get( nick ) )
+              done()
+            })
+      this._internal.socket.emit( "data", f( ":%s@wee JOIN %s\r\n", this.config.nick, c1 ) )
+      this._internal.socket.emit( "data", f( ":%s@wee JOIN %s\r\n", this.config.nick, c2 ) )
+      this._internal.socket.emit( "data"
+        , f( ":card.freenode.net 353 %s @ %s :%s nlogax\r\n", this.config.nick, c1, nick ) )
+      this._internal.socket.emit( "data"
+        , f( ":card.freenode.net 353 %s @ %s :%s nlogax\r\n", this.config.nick, c2, nick ) )
     })
   })
 
   bit( f( "should emit all events as a `%s` event with message as first parameter", EVENT.ANY ), function( done ) {
-    this.listenOnce( EVENT.ANY, function( msg ) {
+    this.observe( EVENT.ANY, function( msg ) {
       msg.command.should.equal( COMMAND.PRIVMSG )
-      done() 
+      done()
     })
 
     this._internal.socket.emit( "data", ":gf3!n=gianni@pdpc/supporter/active/gf3 PRIVMSG #runlevel6 :NO U LOL\r\n")

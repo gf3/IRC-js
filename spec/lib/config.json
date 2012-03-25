@@ -10,8 +10,9 @@
 , "//"               : "Prevent sending lots of stuff in rapid succession"
 , "flood-protection" : false
 
-, "//"  : "Log all messages"
-, "log" : false
+, "//"  : "Log level, a string of one or more log levels"
+, "//"  : "Possible string values: none, debug, info, warning, error, all"
+, "log" : "error"
 
 , "//"   : "Bot nickname"
 , "nick" : "irc-js"

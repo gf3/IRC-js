@@ -1,24 +1,18 @@
-const fs       = require( "fs" )
-    , path     = require( "path" )
-    , format   = require( "util" ).format
-    , should   = require( "should" )
-    , libPath  = path.join( __dirname , "..", "..", "lib" )
-    , fixtPath = path.join( __dirname, "..", "fixtures" )
-    , objects  = require( path.join( libPath, "objects" ) )
-    , parser   = require( path.join( libPath, "parser" ) )
-    , MODE     = require( path.join( libPath, "constants" ) ).MODE
+const fs      = require( "fs" )
+    , path    = require( "path" )
+    , format  = require( "util" ).format
+    , should  = require( "should" )
+    , lib     = path.join( __dirname , "..", "..", "lib" )
+    , help    = require( path.join( __dirname, "..", "helpers" ) )
+    , objects = require( path.join( lib, "objects" ) )
+    , parser  = require( path.join( lib, "parser" ) )
+    , MODE    = require( path.join( lib, "constants" ) ).MODE
 
-
-// Fixtures
-const readFixture = function( fileName ) {
-  return JSON.parse( fs.readFileSync( path.join( fixtPath, fileName ), "utf8" ) )
-}
-
-const messages = readFixture( "messages.json" )
-    , modes    = readFixture( "modes.json" )
-    , prefixes = readFixture( "prefixes.json" )
-    , channels = readFixture( "channels.json" )
-    , nicks    = readFixture( "nicks.json" )
+const messages = help.readFixture( "messages.json" )
+    , modes    = help.readFixture( "modes.json" )
+    , prefixes = help.readFixture( "prefixes.json" )
+    , channels = help.readFixture( "channels.json" )
+    , nicks    = help.readFixture( "nicks.json" )
 
 // Tests
 describe( "parser", function() {
@@ -83,17 +77,17 @@ describe( "parser", function() {
     // Test the Message model
     it( "should return a Message object", function() {
       const m = parser.message( ":brown.freenode.net 333 js-irc #runlevel6 gf3 1252481170=\r\n" )
-      m.constructor.should.equal( objects.Message )
+      m.should.be.an.instanceof( objects.Message )
     })
 
     it( "should have a prefix property of the correct type for a server", function() {
       const m = parser.message( ":brown.freenode.net 333 js-irc #runlevel6 gf3 1252481170=\r\n" )
-      m.prefix.constructor.should.equal( objects.Server )
+      m.prefix.should.be.an.instanceof( objects.Server )
     })
 
     it( "should have a prefix property of the correct type for a person", function() {
       const m = parser.message( ":gf3!n=gianni@pdpc/supporter/active/gf3 PRIVMSG #runlevel6 :oh hai\r\n" )
-      m.prefix.constructor.should.equal( objects.Person )
+      m.prefix.should.be.an.instanceof( objects.Person )
     })
 
     // Expected to succeed

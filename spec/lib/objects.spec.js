@@ -1,15 +1,19 @@
 const f       = require( "util" ).format
+    , fs      = require( "fs" )
     , path    = require( "path" )
     , should  = require( "should" )
-    , bit     = require( path.join( __dirname, "..", "helpers" ) ).bit
+    , help    = require( path.join( __dirname, "..", "helpers" ) )
     , lib     = path.join( __dirname, "..", "..", "lib" )
     , IRC     = require( path.join( lib, "irc" ) )
     , cs      = require( path.join( lib, "constants" ) )
     , o       = require( path.join( lib, "objects" ) )
+    , bit     = help.bit
     , COMMAND = cs.COMMAND
     , EVENT   = cs.EVENT
     , REPLY   = cs.REPLY
     , MODE    = cs.MODE
+
+const msgs = help.readFixture( "messages.json" )
 
 describe( "objects", function() {
   describe( "Message", function() {
@@ -82,25 +86,27 @@ describe( "objects", function() {
 
     describe( "topic", function() {
       bit( "should set its own topic", function() {
-        const chan  = o.channel( "#haskell" ).with( this )
-            , topic = "A monad is just a monoid in the category of endofunctors, what's the problem?"
+        const chan  = o.channel( "#setowntopic" ).with( this )
+            , topic = "My own topic should be set to this"
         chan.setTopic( topic )
         this._internal.socket.output[0].should.equal( f( "TOPIC %s :%s\r\n", chan, topic ) )
       })
 
       bit( "should keep its topic updated", function() {
-        const chan  = this.channels.add( "#topicsoflove" )
-            , topic = "We ♥ topics"
+        const chan  = this.channels.add( "#updatetopic" )
+            , topic = "This topic is so up to date"
+        this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.config.nick, chan ) )
+        this._internal.socket.emit( "data", f( ":%s JOIN %s\r\n", this.config.nick, chan ) )
         this._internal.socket.emit( "data", f( ":topic@setter.com TOPIC %s :%s\r\n", chan, topic ) )
         chan.topic.should.equal( topic )
       })
-      //:leguin.freenode.net 333 basic-irc-js-bot #nlogax basic-irc-js-bot!~irc-js@c-89-160-40-86.cust.bredband2.com 1332238371
     })
 
     describe( "mode", function() {
       bit( "should record the channel mode", function() {
         const chan = o.channel( "#modez" )
         this.channels.add( chan )
+        this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.config.nick, chan ) )
         this._internal.socket.emit( "data", ":the.server.com MODE #modez +am-i\r\n" )
         chan.mode.should.equal( MODE.CHANNEL.ANONYMOUS | MODE.CHANNEL.MODERATED )
         this._internal.socket.emit( "data", ":the.server.com MODE #modez +i\r\n" )
@@ -115,6 +121,8 @@ describe( "objects", function() {
         const mode = "-a+i-mnpqrs+t-bOeIklov"
             , chan = o.channel( "#modez" )
         this.channels.add( chan )
+        this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.config.nick, chan ) )
+        this._internal.socket.emit( "data", f( ":%s JOIN %s\r\n", this.config.nick, chan ) )
         chan.setMode( MODE.CHANNEL.INVITE | MODE.CHANNEL.TOPIC )
         this._internal.socket.output[0].should.equal( f( "MODE %s %s\r\n", chan, mode ) )
         this._internal.socket.emit( "data", f( ":lol@omg.com MODE %s %s\r\n", chan, mode ) )
@@ -124,6 +132,7 @@ describe( "objects", function() {
       bit( "should set the channel mode from a string", function() {
         const chan = this.channels.add( "#modez" )
             , mode = "+it"
+        this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.config.nick, chan ) )
         chan.setMode( "+it" )
         this._internal.socket.output[0].should.equal( f( "MODE %s %s\r\n", chan, mode ) )
         this._internal.socket.emit( "data", f( ":lol@omg.com MODE %s %s\r\n", chan, mode ) )
@@ -133,15 +142,15 @@ describe( "objects", function() {
 
     describe( "invite", function() {
       bit( "should invite people by name", function() {
-        const chan = o.channel( "#awesome" ).with( this )
-            , user = "gf3"
+        const chan = o.channel( "#peoplewithnames" ).with( this )
+            , user = "namedperson"
         chan.invite( user )
         this._internal.socket.output[0].should.equal( f( "INVITE %s %s\r\n", user, chan ) )
       })
 
       bit( "should invite Person objects", function() {
-        const chan = o.channel( "#awesome" ).with( this )
-            , user = o.person( "gf3", "lol", "omg" )
+        const chan = o.channel( "#objectified" ).with( this )
+            , user = o.person( "obj", "lol", "omg" )
         chan.invite( user )
         this._internal.socket.output[0].should.equal( f( "INVITE %s %s\r\n", user.nick, chan ) )
       })
@@ -159,6 +168,18 @@ describe( "objects", function() {
             , key = "keymaster"
         chan.join( key )
         this._internal.socket.output[0].should.equal( f( "JOIN %s %s\r\n", chan.name, key ) )
+      })
+
+      bit( "should join a Channel object with a callback", function( done ) {
+        const chan = o.channel( "#callbackz" ).with( this )
+        chan.join( function( ch ) {
+          chan.should.equal( ch )
+          done()
+        })
+        this._internal.socket.output[0].should.equal( f( "JOIN %s\r\n", chan.name ) )
+        this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.config.nick, chan ) )
+        this._internal.socket.emit( "data"
+          , f( ":card.freenode.net 353 %s @ %s :%s nlogax\r\n", this.config.nick, chan, this.config.nick ) )
       })
     })
 
