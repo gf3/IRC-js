@@ -20,7 +20,7 @@ describe( "objects", function() {
     describe( "send", function() {
       bit( "should send itself", function() {
         const txt = o.trailing( "Message, send thyself" )
-            , msg = o.message( COMMAND.PRIVMSG, [ "#nlogax", txt ] ).with( this )
+            , msg = o.message( COMMAND.PRIVMSG, [ "#nlogax", txt ] ).for( this )
         msg.send()
         this._internal.socket.output[0].should.equal( f( "PRIVMSG #nlogax %s\r\n", txt ) )
       })
@@ -29,14 +29,14 @@ describe( "objects", function() {
     describe( "reply", function() {
       bit( "should reply to channel messages", function() {
         const msg = o.message( o.person( "gf3" ), COMMAND.PRIVMSG
-                             , [ "#jquery-ot", ":wat" ] ).with( this )
+                             , [ "#jquery-ot", ":wat" ] ).for( this )
         msg.reply( "Is these a bug?" )
         this._internal.socket.output[0].should.equal( "PRIVMSG #jquery-ot :Is these a bug?\r\n" )
       })
 
       bit( "should reply to direct messages", function() {
         const msg = o.message( o.person( "gf3" ), COMMAND.PRIVMSG
-                             , [ this.config.nick, ":wat" ] ).with( this )
+                             , [ this.user.nick, ":wat" ] ).for( this )
         msg.reply( "Is these a bug?" )
         this._internal.socket.output[0].should.equal( "PRIVMSG gf3 :Is these a bug?\r\n" )
       })
@@ -86,17 +86,16 @@ describe( "objects", function() {
 
     describe( "topic", function() {
       bit( "should set its own topic", function() {
-        const chan  = o.channel( "#setowntopic" ).with( this )
+        const chan  = o.channel( "#setowntopic" ).for( this )
             , topic = "My own topic should be set to this"
         chan.setTopic( topic )
         this._internal.socket.output[0].should.equal( f( "TOPIC %s :%s\r\n", chan, topic ) )
       })
 
       bit( "should keep its topic updated", function() {
-        const chan  = this.channels.add( "#updatetopic" )
+        const chan  = this.channels.add( "#updatetopic" ).for( this )
             , topic = "This topic is so up to date"
-        this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.config.nick, chan ) )
-        this._internal.socket.emit( "data", f( ":%s JOIN %s\r\n", this.config.nick, chan ) )
+        this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
         this._internal.socket.emit( "data", f( ":topic@setter.com TOPIC %s :%s\r\n", chan, topic ) )
         chan.topic.should.equal( topic )
       })
@@ -104,14 +103,14 @@ describe( "objects", function() {
 
     describe( "mode", function() {
       bit( "should record the channel mode", function() {
-        const chan = o.channel( "#modez" )
+        const chan = o.channel( "#gotmodez" )
         this.channels.add( chan )
-        this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.config.nick, chan ) )
-        this._internal.socket.emit( "data", ":the.server.com MODE #modez +am-i\r\n" )
+        this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
+        this._internal.socket.emit( "data", ":the.server.com MODE #gotmodez +am-i\r\n" )
         chan.mode.should.equal( MODE.CHANNEL.ANONYMOUS | MODE.CHANNEL.MODERATED )
-        this._internal.socket.emit( "data", ":the.server.com MODE #modez +i\r\n" )
+        this._internal.socket.emit( "data", ":the.server.com MODE #gotmodez +i\r\n" )
         chan.mode.should.equal( MODE.CHANNEL.ANONYMOUS | MODE.CHANNEL.MODERATED | MODE.CHANNEL.INVITE )
-        this._internal.socket.emit( "data", ":the.server.com MODE #modez -a\r\n" )
+        this._internal.socket.emit( "data", ":the.server.com MODE #gotmodez -a\r\n" )
         chan.mode.should.equal( MODE.CHANNEL.MODERATED | MODE.CHANNEL.INVITE )
       })
 
@@ -119,10 +118,10 @@ describe( "objects", function() {
         // This is silly, but when turning the mask into a string, every mode *not* set is _un_set
         // @todo {jonas} Make unsilly
         const mode = "-a+i-mnpqrs+t-bOeIklov"
-            , chan = o.channel( "#modez" )
+            , chan = o.channel( "#modezmask" )
         this.channels.add( chan )
-        this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.config.nick, chan ) )
-        this._internal.socket.emit( "data", f( ":%s JOIN %s\r\n", this.config.nick, chan ) )
+        this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
+        this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
         chan.setMode( MODE.CHANNEL.INVITE | MODE.CHANNEL.TOPIC )
         this._internal.socket.output[0].should.equal( f( "MODE %s %s\r\n", chan, mode ) )
         this._internal.socket.emit( "data", f( ":lol@omg.com MODE %s %s\r\n", chan, mode ) )
@@ -132,7 +131,7 @@ describe( "objects", function() {
       bit( "should set the channel mode from a string", function() {
         const chan = this.channels.add( "#modez" )
             , mode = "+it"
-        this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.config.nick, chan ) )
+        this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
         chan.setMode( "+it" )
         this._internal.socket.output[0].should.equal( f( "MODE %s %s\r\n", chan, mode ) )
         this._internal.socket.emit( "data", f( ":lol@omg.com MODE %s %s\r\n", chan, mode ) )
@@ -142,14 +141,14 @@ describe( "objects", function() {
 
     describe( "invite", function() {
       bit( "should invite people by name", function() {
-        const chan = o.channel( "#peoplewithnames" ).with( this )
+        const chan = o.channel( "#peoplewithnames" ).for( this )
             , user = "namedperson"
         chan.invite( user )
         this._internal.socket.output[0].should.equal( f( "INVITE %s %s\r\n", user, chan ) )
       })
 
       bit( "should invite Person objects", function() {
-        const chan = o.channel( "#objectified" ).with( this )
+        const chan = o.channel( "#objectified" ).for( this )
             , user = o.person( "obj", "lol", "omg" )
         chan.invite( user )
         this._internal.socket.output[0].should.equal( f( "INVITE %s %s\r\n", user.nick, chan ) )
@@ -158,41 +157,41 @@ describe( "objects", function() {
 
     describe( "join", function() {
       bit( "should join a Channel object", function() {
-        const chan = o.channel( "#joiners" ).with( this )
+        const chan = o.channel( "#joiners" ).for( this )
         chan.join()
         this._internal.socket.output[0].should.equal( f( "JOIN %s\r\n", chan.name ) )
       })
 
       bit( "should join a Channel object with a key", function() {
-        const chan = o.channel( "#keyjoin" ).with( this )
+        const chan = o.channel( "#keyjoin" ).for( this )
             , key = "keymaster"
         chan.join( key )
         this._internal.socket.output[0].should.equal( f( "JOIN %s %s\r\n", chan.name, key ) )
       })
 
       bit( "should join a Channel object with a callback", function( done ) {
-        const chan = o.channel( "#callbackz" ).with( this )
+        const chan = o.channel( "#callbackz" ).for( this )
         chan.join( function( ch ) {
           chan.should.equal( ch )
           done()
         })
         this._internal.socket.output[0].should.equal( f( "JOIN %s\r\n", chan.name ) )
-        this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.config.nick, chan ) )
+        this._internal.socket.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
         this._internal.socket.emit( "data"
-          , f( ":card.freenode.net 353 %s @ %s :%s nlogax\r\n", this.config.nick, chan, this.config.nick ) )
+          , f( ":card.freenode.net 353 %s @ %s :%s nlogax\r\n", this.user.nick, chan, this.user.nick ) )
       })
     })
 
     describe( "kick", function() {
       bit( "should kick people by name", function() {
-        const chan = o.channel( "#meanies" ).with( this )
+        const chan = o.channel( "#meanies" ).for( this )
             , user = "victim"
         chan.kick( user )
         this._internal.socket.output[0].should.equal( f( "KICK %s %s\r\n", chan, user ) )
       })
 
       bit( "should kick Person objects", function() {
-        const chan = o.channel( "#meanies" ).with( this )
+        const chan = o.channel( "#meanies" ).for( this )
             , user = o.person( "victim" )
         chan.kick( user )
         this._internal.socket.output[0].should.equal( f( "KICK %s %s\r\n", chan, user.nick ) )
@@ -201,7 +200,7 @@ describe( "objects", function() {
 
     describe( "notify", function() {
       bit( "should get notified", function() {
-        const chan   = o.channel( "#notifications" ).with( this )
+        const chan   = o.channel( "#notifications" ).for( this )
             , notice = "Important announcement"
         chan.notify( notice )
         this._internal.socket.output[0].should.equal( f( "NOTICE %s :%s\r\n", chan, notice ) )
@@ -232,20 +231,24 @@ describe( "objects", function() {
     })
 
     describe( "kickFrom", function() {
-      bit( "should get kicked from a channel, by name or using a Channel object", function() {
-        const prsn = o.person( "ada", "u", "h" ).with( this )
-            , chan = o.channel( "#elitists" )
+      bit( "should get kicked from a channel by name", function() {
+        const prsn = o.person( "kicked1", "ki", "ck" ).for( this )
+            , chan = "#namekick"
         prsn.kickFrom( chan )
         this._internal.socket.output[0].should.equal( f( "KICK %s %s\r\n", chan, prsn.nick ) )
+      })
 
-        prsn.kickFrom( "#elitists" )
-        this._internal.socket.output[0].should.equal( f( "KICK %s %s\r\n", chan, prsn.nick ) )
+      bit( "should get kicked from a Channel object", function() {
+        const prsn = o.person( "kicked2", "bo", "om" ).for( this )
+            , chan = o.channel( "#objkick" )
+        prsn.kickFrom( chan )
+        this._internal.socket.output[0].should.equal( f( "KICK %s %s\r\n", chan.name, prsn.nick ) )
       })
     })
 
     describe( "inviteTo", function() {
       bit( "should get invited to a channel, by name or Channel object", function() {
-        const prsn = o.person( "gf3", "eh", "canada" ).with( this )
+        const prsn = o.person( "gf3", "eh", "canada" ).for( this )
             , chan = o.channel( "#america" )
         prsn.inviteTo( chan )
         this._internal.socket.output[0].should.equal( f( "INVITE %s %s\r\n", prsn.nick, chan ) )
@@ -257,7 +260,7 @@ describe( "objects", function() {
 
     describe( "notify", function() {
       bit( "should get notified", function() {
-        const person = o.person( "gf3" ).with( this )
+        const person = o.person( "gf3" ).for( this )
             , notice = "Important announcement"
         person.notify( notice )
         this._internal.socket.output[0].should.equal( f( "NOTICE %s :%s\r\n", person, notice ) )
