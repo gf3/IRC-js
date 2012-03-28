@@ -1,14 +1,16 @@
-const util   = require( "util" )
-    , events = require( "events" )
+const util    = require( "util" )
+    , events  = require( "events" )
 
-var uid = 0
+var uid   = 0
+  , last  = null
 
 const MockStream = function() {
   this.readyState = "closed"
   this.mockConnected = false
   this.mockEnded = false
   this.output = []
-  this.uid = uid++
+  this.uid = uid
+  last = this
 }
 
 util.inherits( MockStream, events.EventEmitter )
@@ -29,6 +31,12 @@ MockStream.prototype.end = function( port, host, connectListener ) {
   this.emit( "end" )
   return this
 }
+
+Object.defineProperty( MockStream, "current", {
+  get: function() {
+    return last
+  }
+})
 
 MockStream.prototype.write = function( data ) {
   this.output.unshift( data )

@@ -65,22 +65,28 @@ bot.lookFor( fmt( "@?%s[: ]+(?:quit|shutdown|die|disconnect) ?(.+)?", bot.user.n
 bot.lookFor( fmt( "@?%s[: ]+(?:part|leave|gtfo)(?: +([+!#&][^ ]+))?(?: (.+))?", bot.user.nick )
            , function( msg, name, txt ) {
   const chan = bot.channels.get( name || msg.params[0] )
+      , from = msg.prefix.nick
   if ( ! chan )
-    return msg.reply( fmt( "I’m not in %s.", name ) )
-  chan.part( txt ? txt.trim() : fmt( "%s told me to leave. Bye!", msg.prefix.nick ) )
+    return msg.reply( fmt( "%s, I’m not in %s.", from, name ) )
+  chan.part( txt ? txt.trim() : fmt( "%s told me to leave. Bye!", from ) )
   if ( chan.name !== msg.params[0] )
-    msg.reply( fmt( "I have left %s.", chan.name ) )
+    msg.reply( fmt( "%s, I have left %s.", from, chan.name ) )
 })
 
 bot.lookFor( fmt( "@?%s[: ]+(?:join|add) +([+!#&][^ ]+)(?: +([^ ]+))?", bot.user.nick )
            , function( msg, name, key ) {
   const chan = bot.channels.get( name )
+      , from = msg.prefix.nick
   if ( chan && chan.name === msg.params[0] )
-    return msg.reply( fmt( "I am already here, %s.", msg.prefix.nick ) )
+    return msg.reply( fmt( "%s, I am already here!", from ) )
   else if ( chan )
-    return msg.reply( fmt( "I am already in %s, and I can prove it. The topic is as follows. %s"
-                         , name, chan.topic || "Hmm, appears to be empty." ) )
-  bot.channels.add( name, key, function( chan ) {
-    msg.reply( fmt( "I am now in %s%s", name, key ? fmt( ", I used “%s” to get in.", key ) : "." ) )
+    return msg.reply( fmt( "%s, I am already in %s, and I can prove it. The topic is as follows. %s"
+                         , from, name, chan.topic || "Hmm, appears to be empty." ) )
+  bot.channels.add( name, key, function( chan, err ) {
+    if ( err ) {
+      msg.reply( fmt( "%s, there was an error when I tried to join %s. Server said “%s”.", from, name, err.message ) )
+      return
+    }
+    msg.reply( fmt( "%s: I am now in %s%s", from, name, key ? fmt( ", I used “%s” to get in.", key ) : "." ) )
   })
 })

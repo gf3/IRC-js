@@ -53,10 +53,10 @@ describe( "observable", function() {
 
     it( "should remove Observers using type and object reference", function() {
       const observable = new Observable( true )
-          , observer = observable.add( "LOL", function() {} )
-      _obs["LOL"].length.should.equal( 1 )
-      observable.remove( "LOL", observer )
-      should.not.exist( _obs["LOL"] )
+          , observer = observable.add( "lol", function() {} )
+      _obs["lol"].length.should.equal( 1 )
+      observable.remove( "lol", observer )
+      should.not.exist( _obs["lol"] )
     })
   })
 
