@@ -13,6 +13,9 @@
 , "main" : "./lib/irc"
 , "directories" : { "lib" : "./lib", "node_libraries" : "./node_libraries" }
 , "engines" : [ "node >=0.4.0" ]
+, "scripts":
+  { "test": "mocha --reporter spec --globals names --require should spec/lib/*.js"
+  }
 , "dependencies" :
   { "PanPG": "0.0.9"
   }
