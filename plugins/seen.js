@@ -6,13 +6,16 @@ const redis = require( "redis" )
     , cnst  = require( "../lib/constants" )
     , obj   = require( "../lib/objects" )
     , parse = require( "../lib/parser" )
+    , log   = require( "../lib/logger" )
+
+const logger = log.get( "ircjs" )
 
 const TOKEN = "ff774f90da063a0dfa783172f16af4e3"
     , HOST  = "pike.redistogo.com"
     , PORT  = 9475
 
 // Redis events
-const EVENT =
+const REDIS =
     { ERROR: "error"
     }
 
@@ -26,24 +29,38 @@ const Seen = function( irc ) {
   rclient.auth( TOKEN )
   this.client = rclient
   this.irc = irc
+
+  this.client.on( REDIS.ERROR, this.error.bind( this ) )
 }
 
-Seen.prototype.seen = function( msg, name ) {
+Seen.prototype.error = function( err ) {
+  logger.log( log.LEVEL.ERROR, "Seen Redis client error: %s", err )
+}
+
+Seen.prototype.seen = function( msg, name, num ) {
   const key = getKey( new obj.Person( name, null, null ).id ) // >_>
+      , ix  = num || 0 // Bonus feature
   if ( msg.prefix.nick === name )
     return msg.reply( fmt( "%s, I see you right now, here in %s.", msg.prefix.nick
                          , this.irc.user.nick === msg.params[0] ? "our cozy private chat" : msg.params[0] ) )
   if ( this.irc.user.nick === name )
     return msg.reply( fmt( "%s, I am here with you in %s.", msg.prefix.nick
                          , this.irc.user.nick === msg.params[0] ? "our sexy private chat" : msg.params[0] ) )
-  this.client.lindex( key, 0, this.reply.bind( this, msg, name ) )
+  this.client.lindex( key, ix, this.reply.bind( this, msg, name ) )
 }
 
 Seen.prototype.reply = function( msg, name, err, res ) {
-  if ( err )
-    return msg.reply( fmt( "%s, I went to see, but there was an error: %s", err ) )
-  if ( ! res )
-    return msg.reply( fmt( "%s, sorry, I have never seen %s.", msg.prefix.nick, name ) )
+  logger.log( log.LEVEL.DEBUG, "Replying to `seen` inquiry" )
+  if ( err ) {
+    msg.reply( fmt( "%s, I went to see, but there was an error: %s", err ) )
+    logger.log( log.LEVEL.DEBUG, "`seen` failed: %s", err )
+    return
+  }
+  if ( ! res ) {
+    msg.reply( fmt( "%s, sorry, I have never seen %s.", msg.prefix.nick, name ) )
+    logger.log( log.LEVEL.DEBUG, "Did not find any entries for %s", name )
+    return
+  }
   const parts = res.match( /^(\d+)(.+)/ )
       , date  = new Date( Number( parts[1] ) )
       , mesg  = parse.message( parts[2] + "\r\n" )
@@ -84,18 +101,21 @@ Seen.prototype.reply = function( msg, name, err, res ) {
     reply += fmt( " %s is here right now.", name )
 
   msg.reply( reply )
+  logger.log( log.LEVEL.DEBUG, "Found stuff for %s, replied: %s", name, reply )
 }
 
 Seen.prototype.log = function( msg ) {
   if ( ! ( msg.prefix instanceof obj.Person ) )
-    return this
+    return
   const now = Date.now()
       , key = getKey( msg.prefix.id )
       , val = now + msg
   this.client.lpush( key, val )
+  logger.log( log.LEVEL.DEBUG, "Pushed message into Redis (maybe)" )
 }
 
 Seen.prototype.disconnect = function( msg ) {
+  logger.log( log.LEVEL.INFO, "Telling seen.js redis client to quit" )
   this.client.quit()
 }
 
@@ -123,7 +143,8 @@ const register = function( irc ) {
   const s = new Seen( irc )
   irc.observe( cnst.EVENT.ANY, s.log.bind( s ) )
   irc.observe( cnst.EVENT.DISCONNECT, s.disconnect.bind( s ) )
-  irc.lookFor( /\bseen +([-`_\{\}\[\]\^\|\\a-z0-9]+)/i, s.seen.bind( s ) )
+  irc.lookFor( /\bseen +([-`_\{\}\[\]\^\|\\a-z0-9]+)(?: +(\d+))?/i, s.seen.bind( s ) )
+  logger.log( log.LEVEL.INFO, "Registered Seen plugin" )
   return "Hooray"
 }
 

@@ -6,7 +6,8 @@ const path = require( "path" )
     , lib  = path.join( here, "..", "lib" )
     , IRC  = require( path.join( lib, "irc" ) ).IRC
     , clr  = require( path.join( lib, "color" ) )
-    , lol  = require( "../plugins/seen" )
+    , seen = require( "../plugins/seen" )
+    , tell = require( "../plugins/tell" )
 
 // Get a path to your config file. If not provided, it will look for
 // "config.json" in the current working directory.
@@ -96,4 +97,5 @@ bot.lookFor( fmt( "@?%s[: ]+(?:join|add) +([+!#&][^ ]+)(?: +([^ ]+))?", bot.user
   })
 })
 
-lol.register( bot )
+seen.register( bot )
+tell.register( bot )
