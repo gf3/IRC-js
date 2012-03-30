@@ -6,6 +6,7 @@ const f       = require( "util" ).format
     , help    = require( path.join( __dirname, "..", "helpers" ) )
     , o       = require( path.join( lib, "objects" ) )
     , cs      = require( path.join( lib, "constants" ) )
+    , IRC     = require( path.join( lib, "irc" ) ).IRC
     , bit     = help.bit
     , conf    = help.conf
     , COMMAND = cs.COMMAND
@@ -16,7 +17,7 @@ const f       = require( "util" ).format
 // Make sure config files are up to date
 const defaultConf = JSON.parse( fs.readFileSync( path.join( lib, "config.json" ) ) )
     , testingConf = JSON.parse( fs.readFileSync( path.join( __dirname, "config.json" ) ) )
-    , exampleConf = JSON.parse( fs.readFileSync( path.join( __dirname, "..", "..", "examples", "basic", "config.json" ) ) )
+    , exampleConf = JSON.parse( fs.readFileSync( path.join( __dirname, "..", "..", "examples", "config.json" ) ) )
     , noComments  = function( k ) { return k !== "//" } // :) // :)
 
 describe( "irc", function() {
@@ -45,8 +46,17 @@ describe( "irc", function() {
             .should.equal( f( "USER %s 12 * :%s\r\n", conf.user.username, conf.user.realname ) )
       })
 
+      bit( "should connect after having been disconnected", function( done ) {
+        this.disconnect()
+        this.connect( function( b ) {
+          b.should.be.an.instanceof( IRC )
+          done()
+        })
+        this._stream.emit( "data", f( ":crichton.freenode.net 001 %s :Welcome to the freenode IRC Network js-irc\r\n", this.user.nick ) )
+      })
+
       bit( "should update server name on 004", function() {
-        this._stream.emit( "data", f( ":holmes.freenode.net 004 ircjsbot holmes.freenode.net ircd-seven-1.1.3 DOQRSZaghilopswz CFILMPQbcefgijklmnopqrstvz bkloveqjfI\r\n", this.user.nick ) )
+        this._stream.emit( "data", f( ":holmes.freenode.net 004 %s holmes.freenode.net ircd-seven-1.1.3 DOQRSZaghilopswz CFILMPQbcefgijklmnopqrstvz bkloveqjfI\r\n", this.user.nick ) )
         this.server.name.should.equal( "holmes.freenode.net" )
       })
     })
@@ -103,13 +113,7 @@ describe( "irc", function() {
       })
 
       // TODO reimplement
-      bit( "should split long messages into multiple messages", function() {
-        return
-        const msg = new Array( 1200 ).join( "x" )
-            , before = this._stream.output.length
-        this.send( o.message( COMMAND.PRIVMSG, [ "#asl", f( ":%s", msg ) ] ) )
-        this._stream.output.length.should.equal( before + 3 )
-      })
+      bit( "should split long messages into multiple messages" )
     })
 
     describe( "channels", function() {
@@ -127,7 +131,7 @@ describe( "irc", function() {
       })
 
       bit( "should let you add Channel objects", function( done ) {
-        const bot = this, chan = new o.Channel( "#addchanobj" )
+        const bot = this, chan = o.channel( "#addchanobj" )
         this.channels.add( chan, function( ch ) {
           bot.channels.contains( "#addchanobj" ).should.equal( true )
           bot.channels.get( "#addchanobj" ).should.equal( chan )
@@ -139,36 +143,55 @@ describe( "irc", function() {
           , f( ":card.freenode.net 353 %s @ %s :%s nlogax\r\n", this.user.nick, chan, this.user.nick ) )
       })
 
-      bit( "should let you remove channels by name", function() {
-        const chan = "#removechanname"
-        this.channels.add( chan )
-        this.channels.contains( chan ).should.equal( true )
-        this.channels.remove( chan )
-        this.channels.contains( chan ).should.equal( false )
+      bit( "should let you remove channels by name", function( done ) {
+        const chan = "#removechanname", bot = this
+        this.channels.add( chan, function( ch ) {
+          bot.channels.contains( chan ).should.equal( true )
+          bot.channels.remove( chan )
+          bot._stream.output[0].should.equal( f( "PART %s\r\n", chan ) )
+          bot._stream.emit( "data", f( ":%s!~a@b.c PART %s\r\n", bot.user.nick, chan ) )
+          bot.channels.contains( chan ).should.equal( false )
+          done()
+        })
+        this._stream.output[0].should.equal( f( "JOIN %s\r\n", chan ) )
+        this._stream.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
+        this._stream.emit( "data"
+          , f( ":card.freenode.net 353 %s @ %s :%s\r\n", this.user.nick, chan, this.user.nick ) )
       })
 
-      bit( "should let you remove Channel objects", function() {
-        const chan = new o.Channel( "#removechanobj" )
-        this.channels.add( chan )
-        this.channels.contains( chan ).should.equal( true )
-        this.channels.remove( chan )
-        this.channels.contains( chan ).should.equal( false )
+      bit( "should let you remove Channel objects", function( done ) {
+        const chan = new o.Channel( "#removechanobj" ), bot = this
+        this.channels.add( chan, function( ch ) {
+          bot.channels.contains( chan ).should.equal( true )
+          bot.channels.remove( chan )
+          bot._stream.output[0].should.equal( f( "PART %s\r\n", chan ) )
+          bot._stream.emit( "data", f( ":%s!~a@b.c PART %s\r\n", bot.user.nick, chan ) )
+          bot.channels.contains( chan ).should.equal( false )
+          done()
+        })
+        this._stream.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
+        this._stream.emit( "data"
+          , f( ":card.freenode.net 353 %s @ %s :%s\r\n", this.user.nick, chan, this.user.nick ) )
       })
 
-      bit( "should add people to its list of users, for various relevant messages", function() {
-        const chan = this.channels.add( "#addpeople" )
+      bit( "should add people to its list of users, for various relevant messages", function( done ) {
+        const bot = this
+            , chan = this.channels.add( "#addpeople", function( ch ) {
+          should.exist( chan.people.get( "protobot" ) )
+          chan.people.get( "protobot" ).should.be.an.instanceof( o.Person )
+          should.exist( chan.people.get( "some" ) )
+          should.exist( chan.people.get( "different" ) )
+          should.exist( chan.people.get( "nicks" ) )
+          chan.people.get( "some" ).should.be.an.instanceof( o.Person )
+          chan.people.get( "different" ).should.be.an.instanceof( o.Person )
+          chan.people.get( "nicks" ).should.be.an.instanceof( o.Person )
+          done()
+        })
+        this._stream.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
         // A specific user JOINs
-        this._stream.emit( "data", f( ":protobot!~protobot@lol.com JOIN %s\r\n", chan ) )
-        should.exist( chan.people.get( "protobot" ) )
-        chan.people.get( "protobot" ).should.be.an.instanceof( o.Person )
+        bot._stream.emit( "data", f( ":protobot!~protobot@lol.com JOIN %s\r\n", chan ) )
         // A name reply for a channel
-        this._stream.emit( "data", f( ":niven.freenode.net 353 %s @ %s :some +different @nicks\r\n", conf.nick, chan ) )
-        should.exist( chan.people.get( "some" ) )
-        should.exist( chan.people.get( "different" ) )
-        should.exist( chan.people.get( "nicks" ) )
-        chan.people.get( "some" ).should.be.an.instanceof( o.Person )
-        chan.people.get( "different" ).should.be.an.instanceof( o.Person )
-        chan.people.get( "nicks" ).should.be.an.instanceof( o.Person )
+        bot._stream.emit( "data", f( ":niven.freenode.net 353 %s @ %s :some +different @nicks\r\n", conf.nick, chan ) )
       })
 
       bit( "should remove people from its list of users", function() {
@@ -178,6 +201,26 @@ describe( "irc", function() {
         this._stream.emit( "data", ":protobot!~protobot@rogers.com JOIN #removepeople\r\n" )
         this._stream.emit( "data", ":protobot!~protobot@rogers.com PART #removepeople\r\n" )
         should.not.exist( this.channels.get( "#removepeople" ).people.get( "protobot" ) )
+        // getting kicked should also remove the person
+        this._stream.emit( "data", ":protobot!~protobot@rogers.com JOIN #removepeople\r\n" )
+        this._stream.emit( "data", ":nemesis!~nemesis@rogers.com KICK #removepeople protobot\r\n" )
+        should.not.exist( this.channels.get( "#removepeople" ).people.get( "protobot" ) )
+        // also quitting
+        this.channels.add( "#quitters" )
+        this._stream.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, "#quitters" ) )
+        this._stream.emit( "data", ":protobot!~protobot@rogers.com JOIN #removepeople\r\n" )
+        this._stream.emit( "data", ":protobot!~protobot@rogers.com JOIN #quitters\r\n" )
+        this._stream.emit( "data", ":protobot!~protobot@rogers.com QUIT :Oh no!\r\n" )
+        should.not.exist( this.channels.get( "#removepeople" ).people.get( "protobot" ) )
+        should.not.exist( this.channels.get( "#quitters" ).people.get( "protobot" ) )
+      })
+
+      bit( "should remove a channel if kicked from it", function() {
+        const chan = this.channels.add( "#kickedfrom" )
+        this._stream.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
+        this.channels.contains( chan ).should.equal( true )
+        this._stream.emit( "data", f( ":kicky@kick.com KICK #lol,%s @other,%s,+another\r\n", chan, this.user.nick ) )
+        this.channels.contains( chan ).should.equal( false )
       })
 
       bit( "should create only one Person instance per user", function( done ) {
@@ -197,10 +240,32 @@ describe( "irc", function() {
           , f( ":card.freenode.net 353 %s @ %s :%s nlogax\r\n", this.user.nick, c2, nick ) )
       })
 
-      bit( "should know that lol{}|^ is the same as LOL[]\\~", function() {
-        const lol = "#lol{}|^"
-        this.channels.add( lol )
-        this.channels.contains( "#LOL[]\\~" ).should.equal( true )
+      bit( "should know that lol{}|^ is the same as LOL[]\\~", function( done ) {
+        const lol = "#lol{}|^", bot = this
+        this.channels.add( lol, function( ch ) {
+          bot.channels.contains( "#LOL[]\\~" ).should.equal( true )
+          done()
+        })
+        this._stream.emit( "data", f( ":%s@wee JOIN %s\r\n", this.user.nick, lol ) )
+        this._stream.emit( "data"
+          , f( ":card.freenode.net 353 %s @ %s :%s nlogax\r\n", this.user.nick, lol, this.user.nick ) )
+      })
+
+      bit( "should rename the channel if forwarded", function( done ) {
+        const c1 = o.channel( "#fwdfrom" )
+            , c2 = o.channel( "#fwdto" )
+        this.channels.add( c1, function( ch, err ) {
+          err.should.be.an.instanceof( Error )
+          err.message.should.equal( "Forwarding to another channel" )
+          ch.name.should.equal( c2.name )
+          done()
+        })
+        this._stream.emit( "data"
+          , f( ":holmes.freenode.net 470 %s %s %s :Forwarding to another channel\r\n", this.user.nick, c1, c2 ) )
+        this._stream.emit( "data", f( ":%s@wee JOIN %s\r\n", this.user.nick, c2 ) )
+        this.channels.contains( c2 ).should.equal( true )
+        this.channels.contains( "#fwdfrom" ).should.equal( false )
+        c1.name.should.equal( c2.name )
       })
     })
 

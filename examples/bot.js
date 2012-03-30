@@ -3,9 +3,10 @@
 const path = require( "path" )
     , fmt  = require( "util" ).format
     , here = __dirname
-    , lib  = path.join( here, "..", "..", "lib" )
+    , lib  = path.join( here, "..", "lib" )
     , IRC  = require( path.join( lib, "irc" ) ).IRC
     , clr  = require( path.join( lib, "color" ) )
+    , lol  = require( "../plugins/seen" )
 
 // Get a path to your config file. If not provided, it will look for
 // "config.json" in the current working directory.
@@ -15,9 +16,9 @@ const conf = path.join( here, process.argv[2] || "config.json" )
 // Create an IRC instance, optionally telling it where the config file is.
 // Then tell it to connect.
 const bot = new IRC( conf ).connect( function( srv ) {
-  // The bot is now connected, add a channel. OK.
+  // The bot is now connected, let's add a channel.
   // The `add` method returns a `Channel` immediately, but the bot has not joined yet.
-  bot.channels.add( "#nlogax", function( chan ) {
+  bot.channels.add( "#nlogax", function( chan, err ) {
     // It has now joined the channel, and we get a `Channel` object.
     // You can `say` stuff in the channel, maybe `setTopic` to something nice.
     chan.say( "Hello!" )
@@ -31,37 +32,39 @@ const bot = new IRC( conf ).connect( function( srv ) {
   })
 })
 
-// Listen for a message matching a pattern, in this case something like `botnick: ur an alligator`
+// Look for a message matching a pattern, in this case something like `botnick: ur an alligator`
 // with some fuzzy matching since people write in fuzzy ways.
-bot.lookFor( fmt( " *@?%s *:? *(you(?:['’]?re)?|u(?: r)|ur?) +(.+)", bot.user.nick )
+bot.lookFor( fmt( " *@?%s *:? *(you(?:['’]?re)?|u(?: r)|ur?) +([^?]+)", bot.user.nick )
            , function( msg, you, remark ) {
   // Each group captured by the pattern is passed as an argument.
   // More capture groups, more arguments.
-  const wittyReply = fmt( "%s: no %s %s", msg.prefix.nick
-                        , you.toUpperCase(), remark.toUpperCase() )
-  // `Message` objects have a set of handy methods, like `reply`.
+  const wittyReply = fmt( "%s, no %s %s", msg.prefix.nick
+                        , you.toUpperCase(), remark )
+  // `Message` objects have some handy methods, like `reply`.
   // It is useful when you want to respond in the same context (e.g. a channel, private message).
-  msg.reply( wittyReply ) // IRC
+  msg.reply( wittyReply )
 })
 
 // Automatically join a channel if invited.
 // For the command names, you can use the provided constans, or type one yourself.
-bot.observe( "invite", function( msg ) {
+bot.observe( "INVITE", function( msg ) {
   const chan = bot.channels.add( msg.params[1] )
   chan.say( fmt( "Thanks for inviting me, %s", msg.prefix.nick ) )
 })
 
-// Love ice cream.
+// Patterns can be string or RegExp. Strings are case insensitive by default.
+// User RegExp, you must set flags yourself.
 bot.lookFor( /\bice +cream\b/i
            , function( msg ) { msg.reply( "I love ice cream." ) } )
 
-// Listen for various commands from bot's human overlords (for now...).
+// Look for various commands from bot's human overlords (for now...).
 bot.lookFor( fmt( "@?%s[: ]+(?:quit|shutdown|die|disconnect) ?(.+)?", bot.user.nick )
            , function( msg, partingWords ) {
   const master = msg.prefix.nick
   bot.quit( partingWords || fmt( "%s told me to quit, goodbye!", master ) )
 })
 
+// Leave a channel if instructed.
 bot.lookFor( fmt( "@?%s[: ]+(?:part|leave|gtfo)(?: +([+!#&][^ ]+))?(?: (.+))?", bot.user.nick )
            , function( msg, name, txt ) {
   const chan = bot.channels.get( name || msg.params[0] )
@@ -73,6 +76,7 @@ bot.lookFor( fmt( "@?%s[: ]+(?:part|leave|gtfo)(?: +([+!#&][^ ]+))?(?: (.+))?", 
     msg.reply( fmt( "%s, I have left %s.", from, chan.name ) )
 })
 
+// Join a channel, with an optional key.
 bot.lookFor( fmt( "@?%s[: ]+(?:join|add) +([+!#&][^ ]+)(?: +([^ ]+))?", bot.user.nick )
            , function( msg, name, key ) {
   const chan = bot.channels.get( name )
@@ -83,10 +87,13 @@ bot.lookFor( fmt( "@?%s[: ]+(?:join|add) +([+!#&][^ ]+)(?: +([^ ]+))?", bot.user
     return msg.reply( fmt( "%s, I am already in %s, and I can prove it. The topic is as follows. %s"
                          , from, name, chan.topic || "Hmm, appears to be empty." ) )
   bot.channels.add( name, key, function( chan, err ) {
+    // If something goes wrong, you receive an Error object.
     if ( err ) {
       msg.reply( fmt( "%s, there was an error when I tried to join %s. Server said “%s”.", from, name, err.message ) )
       return
     }
-    msg.reply( fmt( "%s: I am now in %s%s", from, name, key ? fmt( ", I used “%s” to get in.", key ) : "." ) )
+    msg.reply( fmt( "%s, I am now in %s%s", from, name, key ? fmt( ", I used “%s” to get in.", key ) : "." ) )
   })
 })
+
+lol.register( bot )

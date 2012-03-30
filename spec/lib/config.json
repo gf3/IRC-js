@@ -12,7 +12,7 @@
 
 , "//"  : "Log level, a string of one or more log levels"
 , "//"  : "Possible string values: none, debug, info, warning, error, all"
-, "log" : "none"
+, "log" : "all"
 
 , "//"   : "Bot nickname"
 , "nick" : "irc-js"

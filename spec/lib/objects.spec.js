@@ -163,15 +163,20 @@ describe( "objects", function() {
         this._stream.output[0].should.equal( f( "JOIN %s\r\n", chan.name ) )
       })
 
-      bit( "should join a Channel object with a key", function() {
+      bit( "should join a Channel object with a key", function( done ) {
         const chan = o.channel( "#keyjoin" ).for( this )
             , key = "keymaster"
+            , bot = this
+        this.observe( REPLY.NAMREPLY, function( ch ) {
+          bot.channels.contains( chan ).should.equal( true )
+          done()
+        })
         chan.join( key )
+        this.channels.contains( chan ).should.equal( false )
         this._stream.output[0].should.equal( f( "JOIN %s %s\r\n", chan.name, key ) )
         this._stream.emit( "data", f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
         this._stream.emit( "data"
           , f( ":card.freenode.net 353 %s @ %s :%s nlogax\r\n", this.user.nick, chan, this.user.nick ) )
-        this.channels.contains( chan ).should.equal( true )
       })
 
       bit( "should join a Channel object with a callback", function( done ) {
@@ -265,7 +270,7 @@ describe( "objects", function() {
 
     describe( "factory function", function() {
       it( "should support convenient signatures", function() {
-        o.channel( "lol" ).should.be.an.instanceof( o.Channel )
+        o.channel( "#lol" ).should.be.an.instanceof( o.Channel )
       })
 
       it( "should throw an error if no suitable signature", function() {
@@ -325,19 +330,19 @@ describe( "objects", function() {
 
     describe( "factory function", function() {
       it( "should support convenient signatures", function() {
-        var p = o.person( "lol" )
+        var p = o.person( "lol1" )
         p.should.be.an.instanceof( o.Person )
-        p.nick.should.equal( "lol" )
+        p.nick.should.equal( "lol1" )
         should.not.exist( p.user )
         should.not.exist( p.host )
-        p = o.person( "lol", "omg" )
+        p = o.person( "lol2", "omg" )
         p.should.be.an.instanceof( o.Person )
-        p.nick.should.equal( "lol" )
+        p.nick.should.equal( "lol2" )
         p.user.should.equal( "omg" )
         should.not.exist( p.host )
-        p = o.person( "lol", "omg", "wtf" )
+        p = o.person( "lol3", "omg", "wtf" )
         p.should.be.an.instanceof( o.Person )
-        p.nick.should.equal( "lol" )
+        p.nick.should.equal( "lol3" )
         p.user.should.equal( "omg" )
         p.host.should.equal( "wtf" )
       })

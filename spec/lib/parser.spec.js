@@ -91,8 +91,11 @@ describe( "parser", function() {
     })
 
     // Expected to succeed
-    it( "should successfully parse all good messages", function() {
+    it( "should successfully parse all good/weird messages", function() {
       messages.good.forEach( function( msg, ix ) {
+        parser.message( msg, true ).should.be.ok
+      })
+      messages.weird.forEach( function( msg, ix ) {
         parser.message( msg, true ).should.be.ok
       })
     })
@@ -105,12 +108,11 @@ describe( "parser", function() {
     })
 
     // Test if string to Message back to string is correct
-    it( "should serialize message objects back into identical strings", function() {
+    it( "should serialize message objects back into equivalent strings", function() {
       messages.good.forEach( function( msg, ix ) {
         const msg_ = msg.slice( 0, -2 )
         parser.message( msg ).toString().should.equal( msg_ )
-        // Sanity check :)
-        // parser.message( parser.message( msg ).toString() + "\r\n" ).should.be.ok
+        //parser.message( parser.message( msg ).toString() + "\r\n" ).should.be.ok
       })
     })
   })

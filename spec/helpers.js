@@ -11,7 +11,6 @@ const bit = function( desc, f ) {
   // Expose stuff for convenience
   if ( ! f )
     return it( desc )
-  bot._people = irc.cache.people
   bot._stream = strm.MockStream.current
   fbot = f.bind( bot )
   return it( desc, fbot )
