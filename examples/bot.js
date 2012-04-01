@@ -5,9 +5,6 @@ const path = require( "path" )
     , here = __dirname
     , lib  = path.join( here, "..", "lib" )
     , IRC  = require( path.join( lib, "irc" ) ).IRC
-    , clr  = require( path.join( lib, "color" ) )
-    , seen = require( "../plugins/seen" )
-    , tell = require( "../plugins/tell" )
 
 // Get a path to your config file. If not provided, it will look for
 // "config.json" in the current working directory.
@@ -54,15 +51,15 @@ bot.observe( "INVITE", function( msg ) {
 })
 
 // Patterns can be string or RegExp. Strings are case insensitive by default.
-// User RegExp, you must set flags yourself.
+// If you use RegExp, you must set flags yourself.
 bot.lookFor( /\bice +cream\b/i
            , function( msg ) { msg.reply( "I love ice cream." ) } )
 
 // Look for various commands from bot's human overlords (for now...).
 bot.lookFor( fmt( "@?%s[: ]+(?:quit|shutdown|die|disconnect) ?(.+)?", bot.user.nick )
            , function( msg, partingWords ) {
-  const master = msg.prefix.nick
-  bot.quit( partingWords || fmt( "%s told me to quit, goodbye!", master ) )
+  const overlord = msg.prefix.nick
+  bot.quit( partingWords || fmt( "%s told me to quit, goodbye!", overlord ) )
 })
 
 // Leave a channel if instructed.
@@ -72,7 +69,8 @@ bot.lookFor( fmt( "@?%s[: ]+(?:part|leave|gtfo)(?: +([+!#&][^ ]+))?(?: (.+))?", 
       , from = msg.prefix.nick
   if ( ! chan )
     return msg.reply( fmt( "%s, I’m not in %s.", from, name ) )
-  chan.part( txt ? txt.trim() : fmt( "%s told me to leave. Bye!", from ) )
+  chan.part( txt || fmt( "%s told me to leave. Bye!", from ) )
+  // If the command was issued in another channel, let the sender know.
   if ( chan.name !== msg.params[0] )
     msg.reply( fmt( "%s, I have left %s.", from, chan.name ) )
 })
@@ -96,6 +94,3 @@ bot.lookFor( fmt( "@?%s[: ]+(?:join|add) +([+!#&][^ ]+)(?: +([^ ]+))?", bot.user
     msg.reply( fmt( "%s, I am now in %s%s", from, name, key ? fmt( ", I used “%s” to get in.", key ) : "." ) )
   })
 })
-
-seen.register( bot )
-tell.register( bot )
