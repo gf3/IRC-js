@@ -19,47 +19,47 @@ describe( "parser", function() {
   describe( "message", function() {
     it( "should parse Freenode cloaks", function() {
       const m = parser.message( ":frigg!~eir@freenode/utility-bot/frigg PRIVMSG protobot :VERSION\r\n" )
-      m.prefix.host.should.equal( "freenode/utility-bot/frigg" )
+      m.from.host.should.equal( "freenode/utility-bot/frigg" )
     })
 
     it( "should parse server messages", function() {
       const m = parser.message( ":brown.freenode.net 333 js-irc #runlevel6 gf3 1252481170=\r\n" )
-      m.prefix.name.should.equal( "brown.freenode.net" )
+      m.from.name.should.equal( "brown.freenode.net" )
     })
 
     it( "should parse asterisks in server names", function() {
       const m = parser.message( ":*.quakenet.org MODE #altdeath +v Typone\r\n" )
-      m.prefix.name.should.equal( "*.quakenet.org" )
+      m.from.name.should.equal( "*.quakenet.org" )
     })
 
     it( "should parse server messages with no periods", function() {
       const m = parser.message( ":localhost 333 js-irc #runlevel6 gf3 1252481170=\r\n" )
-      m.prefix.name.should.equal( "localhost" )
+      m.from.name.should.equal( "localhost" )
     })
 
     it( "should parse nicks with backticks", function() {
       const m = parser.message( ":nick`!u@h JOIN :#chan\r\n" )
-      m.prefix.nick.should.equal( "nick`" )
+      m.from.nick.should.equal( "nick`" )
     })
 
     it( "should parse nicks with slashes", function() {
       const m = parser.message( ":ni\\ck!u@h JOIN :#chan\r\n" )
-      m.prefix.nick.should.equal( "ni\\ck" )
+      m.from.nick.should.equal( "ni\\ck" )
     })
 
     it( "should parse nicks with slashes and backticks", function() {
       const m = parser.message( ":davglass\\test`!~davglass@173-27-206-95.client.mchsi.com JOIN :#yui\r\n" )
-      m.prefix.nick.should.equal( "davglass\\test`" )
+      m.from.nick.should.equal( "davglass\\test`" )
     })
 
     it( "should parse users with slashes and carets", function() {
       const m = parser.message( ":peol!~andree_^\\@h55eb1e56.selukra.dyn.perspektivbredband.net JOIN :#jquery\r\n" )
-      m.prefix.user.should.equal( "~andree_^\\" )
+      m.from.user.should.equal( "~andree_^\\" )
     })
 
     it( "should parse users with backticks", function() {
       const m = parser.message( ":luke`!~luke`@117.192.231.56 QUIT :Quit: luke`\r\n" )
-      m.prefix.user.should.equal( "~luke`" )
+      m.from.user.should.equal( "~luke`" )
     })
 
     it( "should parse multiple middle params properly", function() {
@@ -82,12 +82,12 @@ describe( "parser", function() {
 
     it( "should have a prefix property of the correct type for a server", function() {
       const m = parser.message( ":brown.freenode.net 333 js-irc #runlevel6 gf3 1252481170=\r\n" )
-      m.prefix.should.be.an.instanceof( objects.Server )
+      m.from.should.be.an.instanceof( objects.Server )
     })
 
     it( "should have a prefix property of the correct type for a person", function() {
       const m = parser.message( ":gf3!n=gianni@pdpc/supporter/active/gf3 PRIVMSG #runlevel6 :oh hai\r\n" )
-      m.prefix.should.be.an.instanceof( objects.Person )
+      m.from.should.be.an.instanceof( objects.Person )
     })
 
     // Expected to succeed

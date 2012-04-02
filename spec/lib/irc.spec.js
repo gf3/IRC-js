@@ -271,7 +271,7 @@ describe( "irc", function() {
 
     bit( f( "should emit all events as a `%s` event with message as first parameter", EVENT.ANY ), function( done ) {
       this.observe( EVENT.ANY, function( msg ) {
-        msg.command.should.equal( COMMAND.PRIVMSG )
+        msg.type.should.equal( COMMAND.PRIVMSG )
         done()
       })
 

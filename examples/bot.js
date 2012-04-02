@@ -36,7 +36,7 @@ bot.lookFor( fmt( " *@?%s *:? *(you(?:['’]?re)?|u(?: r)|ur?) +([^?]+)", bot.us
            , function( msg, you, remark ) {
   // Each group captured by the pattern is passed as an argument.
   // More capture groups, more arguments.
-  const wittyReply = fmt( "%s, no %s %s", msg.prefix.nick
+  const wittyReply = fmt( "%s, no %s %s", msg.from.nick
                         , you.toUpperCase(), remark )
   // `Message` objects have some handy methods, like `reply`.
   // It is useful when you want to respond in the same context (e.g. a channel, private message).
@@ -47,7 +47,7 @@ bot.lookFor( fmt( " *@?%s *:? *(you(?:['’]?re)?|u(?: r)|ur?) +([^?]+)", bot.us
 // For the command names, you can use the provided constans, or type one yourself.
 bot.observe( "INVITE", function( msg ) {
   const chan = bot.channels.add( msg.params[1] )
-  chan.say( fmt( "Thanks for inviting me, %s", msg.prefix.nick ) )
+  chan.say( fmt( "Thanks for inviting me, %s", msg.from.nick ) )
 })
 
 // Patterns can be string or RegExp. Strings are case insensitive by default.
@@ -58,7 +58,7 @@ bot.lookFor( /\bice +cream\b/i
 // Look for various commands from bot's human overlords (for now...).
 bot.lookFor( fmt( "@?%s[: ]+(?:quit|shutdown|die|disconnect) ?(.+)?", bot.user.nick )
            , function( msg, partingWords ) {
-  const overlord = msg.prefix.nick
+  const overlord = msg.from.nick
   bot.quit( partingWords || fmt( "%s told me to quit, goodbye!", overlord ) )
 })
 
@@ -66,7 +66,7 @@ bot.lookFor( fmt( "@?%s[: ]+(?:quit|shutdown|die|disconnect) ?(.+)?", bot.user.n
 bot.lookFor( fmt( "@?%s[: ]+(?:part|leave|gtfo)(?: +([+!#&][^ ]+))?(?: (.+))?", bot.user.nick )
            , function( msg, name, txt ) {
   const chan = bot.channels.get( name || msg.params[0] )
-      , from = msg.prefix.nick
+      , from = msg.from.nick
   if ( ! chan )
     return msg.reply( fmt( "%s, I’m not in %s.", from, name ) )
   chan.part( txt || fmt( "%s told me to leave. Bye!", from ) )
@@ -79,7 +79,7 @@ bot.lookFor( fmt( "@?%s[: ]+(?:part|leave|gtfo)(?: +([+!#&][^ ]+))?(?: (.+))?", 
 bot.lookFor( fmt( "@?%s[: ]+(?:join|add) +([+!#&][^ ]+)(?: +([^ ]+))?", bot.user.nick )
            , function( msg, name, key ) {
   const chan = bot.channels.get( name )
-      , from = msg.prefix.nick
+      , from = msg.from.nick
   if ( chan && chan.name === msg.params[0] )
     return msg.reply( fmt( "%s, I am already here!", from ) )
   else if ( chan )

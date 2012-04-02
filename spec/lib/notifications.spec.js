@@ -2,7 +2,7 @@ const fmt     = require( "util" ).format
     , path    = require( "path" )
     , should  = require( "should" )
     , lib     = path.join( __dirname, "..", "..", "lib" )
-    , obs     = require( path.join( lib, "observable" ) )
+    , obs     = require( path.join( lib, "notifications" ) )
     , cnst    = require( path.join( lib, "constants" ) )
 
 const Observable  = obs.Observable
@@ -13,7 +13,7 @@ const Observable  = obs.Observable
     , STATUS      = obs.STATUS
     , _obs        = obs._observers
 
-describe( "observable", function() {
+describe( "notifications", function() {
   describe( "Observable", function() {
     it( "should add Observers for one type", function() {
       const observable = new Observable( true )
