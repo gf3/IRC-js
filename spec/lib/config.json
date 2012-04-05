@@ -21,7 +21,7 @@
 , "server" :
 
   { "//"      : "IRC server address"
-  , "address" : "chat.freenode.net"
+  , "address" : "localhost"
 
   , "//"   : "IRC server port"
   , "port" : 6667
