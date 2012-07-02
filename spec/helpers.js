@@ -9,18 +9,19 @@ const readFixture = function( fileName, fp ) {
 }
 
 const conf = path.join( __dirname, "lib", "config.json" )
-    , jonf = JSON.parse( fs.readFileSync( conf, "utf8" ) )
+    , cobj = JSON.parse( fs.readFileSync( conf, "utf8" ) )
 
 const server = srv.server
 
-server.listen( jonf.server.port, jonf.server.address, function() {
+server.listen( cobj.server.port, cobj.server.address, function() {
   console.info( "LISTENING" )
 })
 
-const bot = new irc.IRC( conf ).connect()
+const bot = new irc.Bot( conf ).connect()
 
 // Convenience wrapper around `it`, with added bottage/servage
 const bit = function( desc, f ) {
+  
   server.removeAllListeners( "message" )
   if ( ! f )
     return it( desc )
@@ -28,5 +29,5 @@ const bit = function( desc, f ) {
 }
 
 exports.bit         = bit
-exports.conf        = jonf
+exports.conf        = cobj
 exports.readFixture = readFixture

@@ -7,7 +7,7 @@ const f       = require( "util" ).format
     , o       = require( path.join( lib, "objects" ) )
     , cs      = require( path.join( lib, "constants" ) )
     , irc     = require( path.join( lib, "irc" ) )
-    , IRC     = irc.IRC
+    , Bot     = irc.Bot
     , server  = require( path.join( "..", "server" ) ).server
     , bit     = help.bit
     , conf    = help.conf
@@ -65,7 +65,7 @@ describe( "irc", function() {
         const bot = this
         bot.disconnect()
         bot.connect( function( b ) {
-          b.should.be.an.instanceof( IRC )
+          b.should.be.an.instanceof( Bot )
           done()
           return STATUS.REMOVE
         })
@@ -268,6 +268,9 @@ describe( "irc", function() {
         server.recite( ":protobot3!~protobot@rogers.com JOIN #quitters\r\n" )
         server.recite( ":protobot3!~protobot@rogers.com QUIT :Laterz\r\n" )
         setTimeout( function() {
+          // Currently fails because I wanted to be cool and use a Map, then noticed
+          // the lack of iteration/enumeration of keys, needed to check for and remove
+          // a user from all channels in which they might be lurking.
           should.not.exist( bot.channels.get( "#removepeople" ).people.get( "protobot1" ) )
           should.not.exist( bot.channels.get( "#removepeople" ).people.get( "protobot2" ) )
           should.not.exist( bot.channels.get( "#removepeople" ).people.get( "protobot3" ) )

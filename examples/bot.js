@@ -4,16 +4,16 @@ const path = require( "path" )
     , fmt  = require( "util" ).format
     , here = __dirname
     , lib  = path.join( here, "..", "lib" )
-    , IRC  = require( path.join( lib, "irc" ) ).IRC
+    , Bot  = require( path.join( lib, "irc" ) ).Bot
 
 // Get a path to your config file. If not provided, it will look for
 // "config.json" in the current working directory.
 // Consult the default file for comments about the various options.
 const conf = path.join( here, process.argv[2] || "config.json" )
 
-// Create an IRC instance, optionally telling it where the config file is.
+// Create a Bot instance, optionally telling it where the config file is.
 // Then tell it to connect.
-const bot = new IRC( conf ).connect( function( srv ) {
+const bot = new Bot( conf ).connect( function( srv ) {
   // The bot is now connected, let's add a channel.
   // The `add` method returns a `Channel` immediately, but the bot has not joined yet.
   bot.channels.add( "#nlogax", function( chan, err ) {

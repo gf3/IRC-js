@@ -1,4 +1,9 @@
+/** @module server
+ *  The idea is to test against this as if it were a standard IRC server.
+ *  Still quite some code away from that.
+ */
 const net = require( "net" )
+    , prs = require( "../lib/parser" )
 
 const MSG = /(.+)(\r\n)?/g
     , SEP = "\r\n"
@@ -23,10 +28,6 @@ const mockServer = new net.Server( function( s ) {
     s.write( data )
   })
 
-  mockServer.recite = function( stuff ) {
-    mockServer.emit( "recite", stuff )
-  }
-
   s.on( "data", function( data ) {
     const parts = data.match( MSG )
         , out = []
@@ -35,7 +36,7 @@ const mockServer = new net.Server( function( s ) {
       , msg = null
     if ( buf.length )
       parts.unshift.apply( parts, buf.splice( 0 ) )
-    for ( var i = 0, l = parts.length ; i < l; ++i ) {
+    for ( l = parts.length ; i < l; ++i ) {
       out.push( parts[i] )
       if ( parts[i].lastIndexOf( SEP ) === parts[i].length - SEP.length ) {
         msg = out.splice( 0 ).join( "" )
@@ -51,6 +52,14 @@ const mockServer = new net.Server( function( s ) {
     mockServer.emit( "end" )
   })
 })
+
+mockServer.recite = function( stuff ) {
+  mockServer.emit( "recite", stuff )
+}
+
+const onJoin = function( msg ) {
+  const ch = prs.channel( msg.params[0] )
+}
 
 exports.server  = mockServer
 exports.log     = log

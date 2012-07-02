@@ -11,31 +11,30 @@ const Observable  = obs.Observable
     , notify      = obs.notify
     , observe     = obs.observe
     , STATUS      = obs.STATUS
-    , _obs        = obs._observers
 
 describe( "notifications", function() {
   describe( "Observable", function() {
     it( "should add Observers for one type", function() {
       const observable = new Observable( true )
       observable.add( "addme", function() {} )
-      _obs["addme"].length.should.equal( 1 )
+      observable.get( "addme" ).length.should.equal( 1 )
     })
 
     it( "should add an Observer for several types", function() {
       const observable = new Observable( true )
           , observer = observable.add( "ett", "två", "tre", function() {} )
-      _obs["ett"].length.should.equal( 1 )
-      _obs["två"].length.should.equal( 1 )
-      _obs["tre"].length.should.equal( 1 )
-      _obs["ett"][0].should.equal( observer )
-      _obs["två"][0].should.equal( observer )
-      _obs["tre"][0].should.equal( observer )
+      observable.get( "ett" ).length.should.equal( 1 )
+      observable.get( "två" ).length.should.equal( 1 )
+      observable.get( "tre" ).length.should.equal( 1 )
+      observable.get( "ett" )[0].should.equal( observer )
+      observable.get( "två" )[0].should.equal( observer )
+      observable.get( "tre" )[0].should.equal( observer )
     })
 
     it( "should remove Observers based on status", function() {
       const type = cnst.REPLY.TOPIC
-          , before = _obs[type] ? _obs[type].length : 0
           , observable = new Observable( true )
+          , before = observable.get( type ) ? observable.get( type ).length : 0
 
       const h = function( stuff ) {
         stuff.should.equal( "LOL" )
@@ -43,20 +42,20 @@ describe( "notifications", function() {
       }
 
       observable.add( type, h )
-      _obs[type].length.should.equal( before + 1 )
+      observable.get( type ).length.should.equal( before + 1 )
       observable.notify( type, "LOL" )
       if ( 0 === before )
-        should.not.exist( _obs[type] )
+        should.not.exist( observable.get( type ) )
       else
-        _obs[type].length.should.equal( before )
+        observable.get( type ).length.should.equal( before )
     })
 
     it( "should remove Observers using type and object reference", function() {
       const observable = new Observable( true )
           , observer = observable.add( "lol", function() {} )
-      _obs["lol"].length.should.equal( 1 )
+      observable.get( "lol" ).length.should.equal( 1 )
       observable.remove( "lol", observer )
-      should.not.exist( _obs["lol"] )
+      should.not.exist( observable.get( "lol" ) )
     })
   })
 
