@@ -7,7 +7,7 @@ const f       = require( "util" ).format
     , o       = require( path.join( lib, "objects" ) )
     , cs      = require( path.join( lib, "constants" ) )
     , irc     = require( path.join( lib, "irc" ) )
-    , Bot     = irc.Bot
+    , Client  = irc.Client
     , server  = require( path.join( "..", "server" ) ).server
     , bit     = help.bit
     , conf    = help.conf
@@ -24,7 +24,7 @@ const defaultConf = JSON.parse( fs.readFileSync( path.join( lib, "config.json" )
     , noComments  = function( k ) { return k !== "//" } // :) // :)
 
 describe( "irc", function() {
-  describe( "IRC", function() {
+  describe( "Client", function() {
     describe( "send", function() {
       bit( "should append \"\\r\\n\" if not present", function( done ) {
         server.on( "message", function ok( d ) {
@@ -65,7 +65,7 @@ describe( "irc", function() {
         const bot = this
         bot.disconnect()
         bot.connect( function( b ) {
-          b.should.be.an.instanceof( Bot )
+          b.should.be.an.instanceof( Client )
           done()
           return STATUS.REMOVE
         })

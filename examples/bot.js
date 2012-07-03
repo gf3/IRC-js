@@ -4,7 +4,7 @@ const path = require( "path" )
     , fmt  = require( "util" ).format
     , here = __dirname
     , lib  = path.join( here, "..", "lib" )
-    , Bot  = require( path.join( lib, "irc" ) ).Bot
+    , Bot  = require( path.join( lib, "irc" ) ).Client
 
 // Get a path to your config file. If not provided, it will look for
 // "config.json" in the current working directory.

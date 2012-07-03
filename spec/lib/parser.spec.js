@@ -117,30 +117,24 @@ describe( "parser", function() {
     })
   })
   describe( "mode", function() {
-    it( "should handle the same mode being set and unset at the same time", function() {
-      parser.mode( "+o-o" ).should.eql( [ MODE.CHAR.CHANNEL['o'], MODE.CHAR.CHANNEL['o'] ] )
-      parser.mode( "+it-i").should.eql( [ MODE.CHAR.CHANNEL['i'] | MODE.CHAR.CHANNEL['t'], MODE.CHAR.CHANNEL['i'] ] )
-    })
-
-    it( "should parse channel modes into bitmasks", function() {
+    it( "should parse channel modes", function() {
       modes.channel.good.forEach( function( mode, idx ) {
-        const res = parser.mode( mode, MODE.CHAR.CHANNEL )
-            , chr = mode[1]
-            , bit = MODE.CHAR.CHANNEL[chr]
-        res[mode[0] === "+" ? 0 : 1] & bit .should.equal( bit )
+        const res = parser.mode( mode )
+            , chr = mode[ 1 ]
+        res.get( mode[0] ).indexOf( chr ).should.not.equal( -1 )
       })
       modes.channel.bad.forEach( function( mode, idx ) {
-        const res = parser.mode( mode, MODE.CHAR.CHANNEL )
-        should.equal( res[0], 0 )
+        const res = parser.mode( mode )
+        should.equal( res.get( '+' ).length, 0 )
+        should.equal( res.get( '-' ).length, 0 )
       })
     })
 
     it( "should parse user modes", function() {
       modes.user.good.forEach( function( mode, idx ) {
-        const res = parser.mode( mode, MODE.CHAR.USER )
-            , chr = mode[1]
-            , bit = MODE.CHAR.USER[chr]
-        res[mode[0] === "+" ? 0 : 1] & bit .should.equal( bit )
+        const res = parser.mode( mode )
+            , chr = mode[ 1 ]
+        res.get( mode[0] ).indexOf( chr ).should.not.equal( -1 )
       })
     })
   })

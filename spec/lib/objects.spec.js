@@ -139,36 +139,12 @@ describe( "objects", function() {
         const chan = o.channel( "#gotmodez" )
         this.channels.add( chan )
         server.recite( f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
-        server.recite( ":the.server.com MODE #gotmodez +am-i\r\n" )
+        server.recite( ":the.server.com MODE #gotmodez +ami\r\n" )
+        server.recite( ":the.server.com MODE #gotmodez -i\r\n" )
         setTimeout( function() {
-          chan.mode.should.equal( MODE.CHANNEL.ANONYMOUS | MODE.CHANNEL.MODERATED )
+          chan.mode.sort().should.eql( [ 'a', 'm' ] )
           done()
         }, 10 )
-      })
-
-      bit( "should set the channel mode from a mask", function( done ) {
-        // This is silly, but when turning the mask into a string, every mode *not* set is _un_set
-        // @todo {jonas} Make unsilly
-        const mode = "-a+i-mnpqrs+t-bOeIklov"
-            , chan = o.channel( "#modezmask" )
-            , bot = this
-        this.channels.add( chan )
-        server.on( "message", function ok( m ) {
-          if ( ! /MODE #modezmask/.test( m ) )
-            return
-          server.removeListener( "message", ok )
-          m.should.equal( f( "MODE %s %s\r\n", chan, mode ) )
-          bot.observe( COMMAND.MODE, function( msg ) {
-            if ( msg.params[0] !== chan.name )
-              return
-            chan.mode.should.equal( MODE.CHANNEL.INVITE | MODE.CHANNEL.TOPIC )
-            chan.mode.should.equal( MODE.CHANNEL.INVITE | MODE.CHANNEL.TOPIC )
-            done()
-          })
-          server.recite( f( ":lol@omg.com MODE %s %s\r\n", chan, mode ) )
-        })
-        chan.setMode( MODE.CHANNEL.INVITE | MODE.CHANNEL.TOPIC )
-        server.recite( f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
       })
 
       bit( "should set the channel mode from a string", function( done ) {
@@ -182,7 +158,7 @@ describe( "objects", function() {
           server.recite( f( ":lol@omg.com MODE %s %s\r\n", chan, mode ) )
         })
         this.observe( COMMAND.MODE, function() {
-          chan.mode.should.equal( MODE.CHANNEL.INVITE | MODE.CHANNEL.TOPIC )
+          chan.mode.sort().should.eql( [ 'i', 't' ] )
           done()
         })
         server.recite( f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )

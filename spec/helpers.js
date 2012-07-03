@@ -17,7 +17,7 @@ server.listen( cobj.server.port, cobj.server.address, function() {
   console.info( "LISTENING" )
 })
 
-const bot = new irc.Bot( conf ).connect()
+const bot = new irc.Client( conf ).connect()
 
 // Convenience wrapper around `it`, with added bottage/servage
 const bit = function( desc, f ) {
