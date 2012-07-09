@@ -167,9 +167,9 @@ describe( "irc", function() {
     describe( "channels", function() {
       bit( "should let you add channels by name", function( done ) {
         const bot  = this
-            , chan = this.channels.add( "#addchanname", function( ch ) {
-          bot.channels.contains( chan ).should.equal( true )
-          bot.channels.get( ch.name ).should.equal( chan )
+            , chan = this.join( "#addchanname", function( ch ) {
+          bot.channels.has( chan.id ).should.equal( true )
+          bot.channels.get( ch.id ).should.equal( chan )
           ch.should.equal( chan )
           done()
         })
@@ -180,10 +180,10 @@ describe( "irc", function() {
 
       bit( "should let you add Channel objects", function( done ) {
         const bot = this, chan = o.channel( "#addchanobj" )
-        this.channels.add( chan, function( ch ) {
-          bot.channels.contains( "#addchanobj" ).should.equal( true )
-          bot.channels.get( "#addchanobj" ).should.equal( chan )
-          bot.channels.get( ch ).should.equal( chan )
+        this.join( chan, function( ch ) {
+          bot.channels.has( o.id( "#addchanobj" ) ).should.equal( true )
+          bot.channels.get( o.id( "#addchanobj" ) ).should.equal( chan )
+          bot.channels.get( ch.id ).should.equal( chan )
           done()
         })
         server.recite( f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
@@ -191,9 +191,10 @@ describe( "irc", function() {
       })
 
       bit( "should let you remove channels by name", function( done ) {
-        const chan = "#removechanname", bot = this
-        this.channels.add( chan, function( ch ) {
-          bot.channels.contains( chan ).should.equal( true )
+        const chan = "#removechanname"
+            , bot  = this
+        bot.join( chan, function( ch ) {
+          bot.channels.has( o.id( chan ) ).should.equal( true )
           server.on( "message", function ok( m ) {
             if ( ! /PART/.test( m ) )
               return
@@ -202,25 +203,26 @@ describe( "irc", function() {
             server.recite( f( ":%s!~a@b.c PART %s\r\n", bot.user.nick, chan ) )
             done()
           })
-          bot.channels.remove( chan )
+          bot.part( chan )
         })
         server.recite( f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
         server.recite( f( ":card.freenode.net 353 %s @ %s :%s\r\n", this.user.nick, chan, this.user.nick ) )
       })
 
       bit( "should let you remove Channel objects", function( done ) {
-        const chan = new o.Channel( "#removechanobj" ), bot = this
-        this.channels.add( chan, function( ch ) {
-          bot.channels.contains( chan ).should.equal( true )
+        const chan = new o.Channel( "#removechanobj" )
+            , bot  = this
+        bot.join( chan, function( ch ) {
+          bot.channels.has( chan.id ).should.equal( true )
           server.on( "message", function ok( m ) {
             if ( ! /PART/.test( m ) )
               return
             server.removeListener( "message", ok )
             m.should.equal( f( "PART %s\r\n", chan ) )
           })
-          bot.channels.remove( chan )
+          bot.part( chan )
           bot.observe( COMMAND.PART, function() {
-            bot.channels.contains( chan ).should.equal( false )
+            bot.channels.has( chan.id ).should.equal( false )
             return STATUS.REMOVE
           })
           server.recite( f( ":%s!~a@b.c PART %s\r\n", bot.user.nick, chan ) )
@@ -232,7 +234,7 @@ describe( "irc", function() {
 
       bit( "should add people to its list of users, for various relevant messages", function( done ) {
         const bot = this
-            , chan = this.channels.add( "#addpeople" )
+            , chan = this.join( "#addpeople" )
         server.recite( f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
         // A name reply for a channel
         server.recite( f( ":niven.freenode.net 353 %s @ %s :some +different @nicks\r\n", conf.nick, chan ) )
@@ -240,20 +242,21 @@ describe( "irc", function() {
         server.recite( f( ":protobot!~protobot@lol.com JOIN %s\r\n", chan ) )
 
         setTimeout( function() {
-          should.exist( chan.people.get( "protobot" ) )
-          chan.people.get( "protobot" ).should.be.an.instanceof( o.Person )
-          should.exist( chan.people.get( "some" ) )
-          should.exist( chan.people.get( "different" ) )
-          should.exist( chan.people.get( "nicks" ) )
-          chan.people.get( "some" ).should.be.an.instanceof( o.Person )
-          chan.people.get( "different" ).should.be.an.instanceof( o.Person )
-          chan.people.get( "nicks" ).should.be.an.instanceof( o.Person )
+          should.exist( chan.people.get( o.id( "protobot" ) ) )
+          chan.people.get( o.id( "protobot" ) ).should.be.an.instanceof( o.Person )
+          should.exist( chan.people.get( o.id( "some" ) ) )
+          should.exist( chan.people.get( o.id( "different" ) ) )
+          should.exist( chan.people.get( o.id( "nicks" ) ) )
+          chan.people.get( o.id( "some" ) ).should.be.an.instanceof( o.Person )
+          chan.people.get( o.id( "different" ) ).should.be.an.instanceof( o.Person )
+          chan.people.get( o.id( "nicks" ) ).should.be.an.instanceof( o.Person )
           done()
         }, 10 )
       })
 
       bit( "should remove people from its list of users", function( done ) {
-        const chan = this.channels.add( "#removepeople" ), bot = this
+        const chan = o.channel( "#removepeople" ).for( this ).join()
+            , bot  = this
         server.recite( f( ":%s!~a@b.c JOIN %s\r\n", bot.user.nick, chan ) )
         // Hit and run lol
         server.recite( ":protobot1!~protobot@rogers.com JOIN #removepeople\r\n" )
@@ -262,7 +265,7 @@ describe( "irc", function() {
         server.recite( ":protobot2!~protobot@rogers.com JOIN #removepeople\r\n" )
         server.recite( ":evilbot!~nemesis@rogers.com KICK #removepeople protobot2\r\n" )
         // also quitting
-        bot.channels.add( "#quitters" )
+        bot.join( "#quitters" )
         server.recite( f( ":%s!~a@b.c JOIN %s\r\n", bot.user.nick, "#quitters" ) )
         server.recite( ":protobot3!~protobot@rogers.com JOIN #removepeople\r\n" )
         server.recite( ":protobot3!~protobot@rogers.com JOIN #quitters\r\n" )
@@ -271,22 +274,22 @@ describe( "irc", function() {
           // Currently fails because I wanted to be cool and use a Map, then noticed
           // the lack of iteration/enumeration of keys, needed to check for and remove
           // a user from all channels in which they might be lurking.
-          should.not.exist( bot.channels.get( "#removepeople" ).people.get( "protobot1" ) )
-          should.not.exist( bot.channels.get( "#removepeople" ).people.get( "protobot2" ) )
-          should.not.exist( bot.channels.get( "#removepeople" ).people.get( "protobot3" ) )
-          should.not.exist( bot.channels.get( "#quitters" ).people.get( "protobot3" ) )
+          should.not.exist( bot.channels.get( o.id( "#removepeople" ) ).people.get( "protobot1" ) )
+          should.not.exist( bot.channels.get( o.id( "#removepeople" ) ).people.get( "protobot2" ) )
+          should.not.exist( bot.channels.get( o.id( "#removepeople" ) ).people.get( "protobot3" ) )
+          should.not.exist( bot.channels.get( o.id( "#quitters" ) ).people.get( "protobot3" ) )
           done()
         }, 10 )
       })
 
       bit( "should remove a channel if kicked from it", function( done ) {
-        const chan = this.channels.add( "#kickedfrom" ), bot = this
+        const chan = this.join( "#kickedfrom" ), bot = this
         server.recite( f( ":%s!~a@b.c JOIN %s\r\n", bot.user.nick, chan ) )
         setTimeout( function() {
-          bot.channels.contains( chan ).should.equal( true )
+          bot.channels.has( o.id( "#kickedfrom" ) ).should.equal( true )
           server.recite( f( ":kicky@kick.com KICK #lol,%s @other,%s,+another\r\n", chan, bot.user.nick ) )
           setTimeout( function() {
-            bot.channels.contains( chan ).should.equal( false )
+            bot.channels.has( o.id( "#kickedfrom" ) ).should.equal( false )
             done()
           }, 10 )
         }, 10 )
@@ -294,23 +297,24 @@ describe( "irc", function() {
 
       bit( "should create only one Person instance per user", function( done ) {
         const nick = "unique"
-            , c1 = this.channels.add( "#channelone" )
-            , c2 = this.channels.add( "#channeltwo"
-              , function( ch ) {
-                ch.people.get( nick ).should.equal( c1.people.get( nick ) )
-                c1.people.get( nick ).should.equal( c2.people.get( nick ) )
-                done()
-              })
-        server.recite( f( ":%s@wee JOIN %s\r\n", this.user.nick, c1 ) )
-        server.recite( f( ":%s@wee JOIN %s\r\n", this.user.nick, c2 ) )
-        server.recite( f( ":card.freenode.net 353 %s @ %s :%s nlogax\r\n", this.user.nick, c1, nick ) )
-        server.recite( f( ":card.freenode.net 353 %s @ %s :%s nlogax\r\n", this.user.nick, c2, nick ) )
+            , bot  = this
+        bot.join( "#channelone" )
+        bot.join( "#channeltwo"
+          , function( ch ) {
+            ch.people.get( o.id( nick ) ).should.equal(
+              bot.channels.get( o.id( "#channelone" ) ).people.get( o.id( nick ) ) )
+            done()
+          })
+        server.recite( f( ":%s@wee JOIN %s\r\n", this.user.nick, "#channelone" ) )
+        server.recite( f( ":%s@wee JOIN %s\r\n", this.user.nick, "#channeltwo" ) )
+        server.recite( f( ":card.freenode.net 353 %s @ %s :%s nlogax\r\n", this.user.nick, "#channelone", nick ) )
+        server.recite( f( ":card.freenode.net 353 %s @ %s :%s nlogax\r\n", this.user.nick, "#channeltwo", nick ) )
       })
 
       bit( "should know that lol{}|^ is the same as LOL[]\\~", function( done ) {
         const lol = "#lol{}|^", bot = this
-        this.channels.add( lol, function( ch ) {
-          bot.channels.contains( "#LOL[]\\~" ).should.equal( true )
+        this.join( lol, function( ch ) {
+          bot.channels.has( "#LOL[]\\~" ).should.equal( true )
           done()
         })
         server.recite( f( ":%s@wee JOIN %s\r\n", this.user.nick, lol ) )
@@ -322,12 +326,12 @@ describe( "irc", function() {
         const c1 = o.channel( "#fwdfrom" )
             , c2 = o.channel( "#fwdto" )
             , bot = this
-        this.channels.add( c1, function( ch, err ) {
+        this.join( c1, function( ch, err ) {
           err.should.be.an.instanceof( Error )
           err.message.should.equal( "Forwarding to another channel" )
           ch.name.should.equal( c2.name )
-          bot.channels.contains( c2 ).should.equal( true )
-          bot.channels.contains( "#fwdfrom" ).should.equal( false )
+          bot.channels.has( c2.id ).should.equal( true )
+          bot.channels.has( o.id( "#fwdfrom" ) ).should.equal( false )
           done()
         })
         server.recite( f( ":holmes.freenode.net 470 %s %s %s :Forwarding to another channel\r\n"

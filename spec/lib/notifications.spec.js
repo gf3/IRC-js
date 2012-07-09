@@ -10,7 +10,7 @@ const Observable  = obs.Observable
     , ignore      = obs.ignore
     , notify      = obs.notify
     , observe     = obs.observe
-    , STATUS      = obs.STATUS
+    , STATUS      = cnst.STATUS
 
 describe( "notifications", function() {
   describe( "Observable", function() {

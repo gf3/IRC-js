@@ -108,6 +108,7 @@ describe( "objects", function() {
       bit( "should set its own topic", function( done ) {
         const chan  = o.channel( "#setowntopic" ).for( this )
             , topic = "My own topic should be set to this"
+        chan.join()
         server.recite( f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
         server.on( "message", function ok( m ) {
           if ( ! /TOPIC #setowntopic/.test( m ) )
@@ -123,7 +124,7 @@ describe( "objects", function() {
       })
 
       bit( "should keep its topic updated", function( done ) {
-        const chan  = this.channels.add( "#updatetopic" ).for( this )
+        const chan  = this.join( "#updatetopic" ).for( this )
             , topic = "This topic is so up to date"
         server.recite( f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
         server.recite( f( ":topic@setter.com TOPIC %s :%s\r\n", chan, topic ) )
@@ -137,7 +138,7 @@ describe( "objects", function() {
     describe( "mode", function() {
       bit( "should record the channel mode", function( done ) {
         const chan = o.channel( "#gotmodez" )
-        this.channels.add( chan )
+        this.join( chan )
         server.recite( f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )
         server.recite( ":the.server.com MODE #gotmodez +ami\r\n" )
         server.recite( ":the.server.com MODE #gotmodez -i\r\n" )
@@ -148,7 +149,7 @@ describe( "objects", function() {
       })
 
       bit( "should set the channel mode from a string", function( done ) {
-        const chan = this.channels.add( "#modez" )
+        const chan = this.join( "#modez" )
             , mode = "+it"
         server.on( "message", function ok( m ) {
           if ( ! /MODE #modez/.test( m ) )
@@ -218,10 +219,10 @@ describe( "objects", function() {
             , key = "keymaster"
             , bot = this
         chan.join( key, function( ch ) {
-          bot.channels.contains( chan ).should.equal( true )
+          bot.channels.has( chan.id ).should.equal( true )
           done()
         })
-        this.channels.contains( chan ).should.equal( false )
+        this.channels.has( chan.id ).should.equal( false )
         server.on( "message", function ok( m ) {
           if ( ! /JOIN/.test( m ) )
             return
@@ -238,8 +239,8 @@ describe( "objects", function() {
             , bot = this
         chan.join( function( ch ) {
           chan.should.equal( ch )
-          ch.people.contains( bot.user ).should.equal( true )
-          ch.people.contains( "nlogax" ).should.equal( true )
+          ch.people.has( bot.user.id ).should.equal( true )
+          ch.people.has( o.id( "nlogax" ) ).should.equal( true )
           done()
         })
         server.on( "message", function ok( m ) {

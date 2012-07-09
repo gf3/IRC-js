@@ -24,7 +24,7 @@ const bot = new Bot( conf ).connect( function( srv ) {
         .setTopic( fmt( "%s was here @ %s", bot.user.nick, new Date() ) )
     // A `Channel` contains `Person` objects (unless it's empty, of course).
     // You can access these through the `people` property.
-    chan.people.contains( "nlogax" )                // Is nlogax in the channel?
+    chan.people.has( "nlogax" )                     // Is nlogax in the channel?
       ? chan.say( "nlogax: I red{♥} U".colorize() ) // If so, show appreciation for your creator.
       : chan.invite( "nlogax", "WHERE R U" )        // If not, try to invite nlogax.
   })
