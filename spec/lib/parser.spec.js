@@ -120,13 +120,15 @@ describe( "parser", function() {
     it( "should parse channel modes", function() {
       modes.channel.good.forEach( function( mode, idx ) {
         const res = parser.mode( mode )
+            , sgn = mode[ 0 ] // '+' or '-'
             , chr = mode[ 1 ]
-        res.get( mode[0] ).indexOf( chr ).should.not.equal( -1 )
+        var index = res.indexOf( chr )
+        index.should.not.equal( -1 )
+        res[ index - 1 ].should.equal( sgn === '+' )
       })
       modes.channel.bad.forEach( function( mode, idx ) {
         const res = parser.mode( mode )
-        should.equal( res.get( '+' ).length, 0 )
-        should.equal( res.get( '-' ).length, 0 )
+        res.length.should.equal( 0 )
       })
     })
 
@@ -134,7 +136,7 @@ describe( "parser", function() {
       modes.user.good.forEach( function( mode, idx ) {
         const res = parser.mode( mode )
             , chr = mode[ 1 ]
-        res.get( mode[0] ).indexOf( chr ).should.not.equal( -1 )
+        res.indexOf( chr ).should.not.equal( -1 )
       })
     })
   })

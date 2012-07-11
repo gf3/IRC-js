@@ -143,7 +143,9 @@ describe( "objects", function() {
         server.recite( ":the.server.com MODE #gotmodez +ami\r\n" )
         server.recite( ":the.server.com MODE #gotmodez -i\r\n" )
         setTimeout( function() {
-          chan.mode.sort().should.eql( [ 'a', 'm' ] )
+          chan.mode.has( 'a' ).should.equal( true )
+          chan.mode.has( 'm' ).should.equal( true )
+          chan.mode.has( 'i' ).should.equal( false )
           done()
         }, 10 )
       })
@@ -159,7 +161,9 @@ describe( "objects", function() {
           server.recite( f( ":lol@omg.com MODE %s %s\r\n", chan, mode ) )
         })
         this.observe( COMMAND.MODE, function() {
-          chan.mode.sort().should.eql( [ 'i', 't' ] )
+          chan.mode.has( 'i' ).should.equal( true )
+          chan.mode.has( 't' ).should.equal( true )
+          chan.mode.has( 'x' ).should.equal( false )
           done()
         })
         server.recite( f( ":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan ) )

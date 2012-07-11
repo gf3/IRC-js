@@ -20,7 +20,6 @@ const f       = require( "util" ).format
 // Make sure config files are up to date
 const defaultConf = JSON.parse( fs.readFileSync( path.join( lib, "config.json" ) ) )
     , testingConf = JSON.parse( fs.readFileSync( path.join( __dirname, "config.json" ) ) )
-    , exampleConf = JSON.parse( fs.readFileSync( path.join( __dirname, "..", "..", "examples", "config.json" ) ) )
     , noComments  = function( k ) { return k !== "//" } // :) // :)
 
 describe( "irc", function() {
@@ -274,10 +273,14 @@ describe( "irc", function() {
           // Currently fails because I wanted to be cool and use a Map, then noticed
           // the lack of iteration/enumeration of keys, needed to check for and remove
           // a user from all channels in which they might be lurking.
-          should.not.exist( bot.channels.get( o.id( "#removepeople" ) ).people.get( "protobot1" ) )
-          should.not.exist( bot.channels.get( o.id( "#removepeople" ) ).people.get( "protobot2" ) )
-          should.not.exist( bot.channels.get( o.id( "#removepeople" ) ).people.get( "protobot3" ) )
-          should.not.exist( bot.channels.get( o.id( "#quitters" ) ).people.get( "protobot3" ) )
+          should.not.exist( bot.channels.get( o.id( "#removepeople" ) )
+            .people.get( o.id( "protobot1" ) ) )
+          should.not.exist( bot.channels.get( o.id( "#removepeople" ) )
+            .people.get( o.id( "protobot2" ) ) )
+          should.not.exist( bot.channels.get( o.id( "#removepeople" ) )
+            .people.get( o.id( "protobot3" ) ) )
+          should.not.exist( bot.channels.get( o.id( "#quitters" ) )
+            .people.get( o.id( "protobot3" ) ) )
           done()
         }, 10 )
       })
@@ -355,7 +358,6 @@ describe( "irc", function() {
     it( "should be kept in sync with provided default config", function() {
       const defKeys  = Object.keys( defaultConf ).filter( noComments )
           , testKeys = Object.keys( testingConf ).filter( noComments )
-          , exmpKeys = Object.keys( exampleConf ).filter( noComments )
       defKeys.length.should.equal( testKeys.length )
       defKeys.every( function( k ) { return k in testingConf } ).should.be.ok
       Object.keys( defaultConf.user ).should.eql( Object.keys( testingConf.user ) )
