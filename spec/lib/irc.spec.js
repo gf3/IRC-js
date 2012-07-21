@@ -75,14 +75,14 @@ describe( "irc", function() {
       })
 
       bit( "should update server name on 004", function( done ) {
-        const bot = this
-        bot.observe( REPLY.MYINFO, function() {
-          bot.server.name.should.equal( "holmes.freenode.net" )
-          done()
-          // Better set it back now :)
-          bot.server.name = conf.server.address
-          return STATUS.REMOVE
-        })
+        const bot  = this
+            , handler = function( _ ) {
+                bot.server.name.should.equal( "holmes.freenode.net" )
+                bot.server.name = conf.server.address
+                bot.ignore( REPLY.MYINFO, handler )
+                done()
+              }
+        bot.listen( REPLY.MYINFO, handler )
         server.recite( f( ":holmes.freenode.net 004 %s holmes.freenode.net ircd-seven-1.1.3 DOQRSZaghilopswz CFILMPQbcefgijklmnopqrstvz bkloveqjfI\r\n"
                         , this.user.nick ) )
       })
@@ -220,10 +220,11 @@ describe( "irc", function() {
             m.should.equal( f( "PART %s\r\n", chan ) )
           })
           bot.part( chan )
-          bot.observe( COMMAND.PART, function() {
+          const handler = function( _ ) {
             bot.channels.has( chan.id ).should.equal( false )
-            return STATUS.REMOVE
-          })
+            bot.ignore( COMMAND.PART, handler )
+          }
+          bot.listen( COMMAND.PART, handler )
           server.recite( f( ":%s!~a@b.c PART %s\r\n", bot.user.nick, chan ) )
           done()
         })
@@ -344,12 +345,12 @@ describe( "irc", function() {
     })
 
     bit( f( "should emit all events as a `%s` event with message as first parameter", EVENT.ANY ), function( done ) {
-      this.observe( EVENT.ANY, function( msg ) {
+      const bot = this, handler = function( msg ) {
         msg.type.should.equal( COMMAND.PRIVMSG )
+        bot.ignore( EVENT.ANY, handler )
         done()
-        return STATUS.REMOVE
-      })
-
+      }
+      bot.listen( EVENT.ANY, handler )
       server.recite( ":gf3!n=gianni@pdpc/supporter/active/gf3 PRIVMSG #runlevel6 :ANY LOL\r\n")
     })
   })

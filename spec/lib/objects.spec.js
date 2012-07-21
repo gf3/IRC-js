@@ -160,7 +160,7 @@ describe( "objects", function() {
           m.should.equal( f( "MODE %s %s\r\n", chan, mode ) )
           server.recite( f( ":lol@omg.com MODE %s %s\r\n", chan, mode ) )
         })
-        this.observe( COMMAND.MODE, function() {
+        this.listen( COMMAND.MODE, function() {
           chan.mode.has( 'i' ).should.equal( true )
           chan.mode.has( 't' ).should.equal( true )
           chan.mode.has( 'x' ).should.equal( false )

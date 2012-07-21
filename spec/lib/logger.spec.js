@@ -3,13 +3,13 @@ const path      = require( "path" )
     , lib       = path.join( __dirname, "..", "..", "lib" )
     , logger    = require( path.join( lib, "logger" ) )
     , constants = require( path.join( lib, "constants" ) )
-    , IRCLog    = logger.IRCLog
+    , Logger    = logger.Logger
     , LEVEL     = constants.LEVEL
 
 const l = logger.get( "speclog", LEVEL.ALL )
 
 describe( "logger", function() {
-  describe( "IRCLog", function() {
+  describe( "Logger", function() {
     describe( "log", function() {
       it( "should log debug messages", function() {
         l.level = LEVEL.DEBUG

@@ -13,9 +13,7 @@ const conf = path.join( __dirname, "lib", "config.json" )
 
 const server = srv.server
 
-server.listen( cobj.server.port, cobj.server.address, function() {
-  console.info( "LISTENING" )
-})
+server.listen( cobj.server.port, cobj.server.address )
 
 const bot = new irc.Client( conf ).connect()
 
