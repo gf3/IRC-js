@@ -1,0 +1,96 @@
+/** This stuff is prepended when generating the parser:
+ *  const irc = require("irc");
+var p = require("./lib/parser");
+p.parse(":gf3!n=gianni@pdpc/supporter/active/gf3 PRIVMSG #runlevel6 :hi\r\n"); 
+ */
+
+Message
+  = prefix:Prefix?
+    command:Command
+    params:Params? CRLF {
+      return new irc.Message(prefix || null, command, params || []);
+    }
+
+Prefix
+  = ":" prefix:(Server / Person) {
+    return prefix;
+  }
+
+Server
+  = server:(AlphaNum / SquareBrackets / [-_.|*])+ !(User / Host) Space {
+    return new irc.Server(server.join(""));
+  }
+
+Person
+  = nick:Nick userHost:(User? Host)? Space {
+    const user = userHost ? userHost[0] : null;
+    const host = userHost ? userHost[1] : null;
+    return irc.person(nick, user || null, host || null);
+  }
+
+Nick
+  = chars:(AlphaNum / SquareBrackets / CurlyBrackets / [-_^|\\`])+ {
+    return chars.join("");
+  }
+
+User
+  = "!" chars:(AlphaNum / SquareBrackets / [-_=.~^\\`])+ {
+    return chars.join("");
+  }
+
+Host
+  = "@" chars:(AlphaNum / SquareBrackets / [-_.|:/])+ {
+    return chars.join("");
+  }
+
+// Is there something like Num{3} in PEG.js?
+Command
+  = chars:(Letter+ / (Num Num Num)) { return chars.join(""); }
+
+Params
+  = Space middle:Middle* trailing:Trailing? {
+    const params = middle;
+    if (trailing) {
+      params.push(trailing);
+    }
+    return params;
+  }
+
+Middle
+  = param:(!":" !Space NonTerminating)+ Space? {
+    return param.map(function(part) { return part[2]; }).join("");
+  }
+
+Trailing
+  = param:(":" (NonTerminating / Space)*) {
+    return param[0] + param[1].join("");
+  }
+
+NonTerminating  = [^\u000A\u000D]
+SquareBrackets  = [[\]]
+CurlyBrackets   = [{}]
+AlphaNum        = (Letter / Num)
+Letter          = [a-zA-Z]
+Num             = [0-9]
+CRLF            = [\u000D][\u000A]
+Space           = [\u0020]+
+
+// Some extra stuff for convenience.
+
+Channel
+  = channel:(("!" / "#" / "&" / "+") [^\u0007\u0020,:]+) {
+    const name = channel[0] + channel[1].join("");
+    return irc.channel(name);
+  }
+
+Mode
+  = mode:(("+" / "-") Letter+)+ {
+    const modes = new Map();
+    modes.set("+", []);
+    modes.set("-", []);
+    for (let i = 0, l = mode.length, m; i < l; ++i) {
+      m = modes.get(mode[i][0]);
+      m.push.apply(m, mode[i][1]);
+    } 
+    return modes;
+  }

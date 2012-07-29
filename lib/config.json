@@ -1,41 +1,40 @@
-{ "//" : "This is the default configuration file"
-, "//" : "Copy it to your bot and adapt"
+{
+  "//": "This is the default configuration file",
+  "//": "Copy it to your bot and adapt",
 
-, "//"  : "Should the bot crash and burn on errors?"
-, "die" : false
+  "//": "Should the bot crash and burn on errors?",
+  "die": false,
 
-, "//"       : "The encoding which the bot should use"
-, "encoding" : "ascii"
+  "//": "The encoding which the bot should use",
+  "encoding": "ascii",
 
-, "//"               : "Prevent sending lots of stuff in rapid succession"
-, "flood-protection" : false
+  "//": "Prevent sending lots of messages in rapid succession",
+  "flood-protection" : false,
 
-, "//"  : "Log all messages"
-, "log" : true
+  "//": "Logging level, any combination of: debug, info, warn, error (or: all, none)",
+  "log": "warn error",
 
-, "//"   : "Bot nickname"
-, "nick" : "irc-js"
+  "//": "Bot nickname",
+  "nick": "irc-js",
 
-, "//"     : "Server settings"
-, "server" :
+  "//": "Server settings",
+  "server": {
+    "//": "IRC server address",
+    "address": "chat.freenode.net",
 
-  { "//"      : "IRC server address"
-  , "address" : "chat.freenode.net"
+    "//": "IRC server port",
+    "port": 6667,
 
-  , "//"   : "IRC server port"
-  , "port" : 6667
+    "//": "Connect using the Secure Sockets Layer protocol",
+    "ssl": false
+  },
 
-  , "//"  : "Connect using the Secure Sockets Layer protocol"
-  , "ssl" : false
-  }
-
-, "//"   : "How the bot presents itself to the server and other clients"
-, "user" :
-
-  { "hostname" : "internet"
-  , "mode"     : "+iw"
-  , "password" : null
-  , "realname" : "Botty McIRC"
-  , "username" : "irc-js"
+  "//": "The bot's user details",
+  "user": {
+    "hostname": "internet",
+    "mode":     "+iw",
+    "password": null,
+    "realname": "Botty McIRC",
+    "username": "irc-js"
   }
 }

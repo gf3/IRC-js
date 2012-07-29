@@ -1,13 +1,14 @@
-{ "good":
-  [ "@lol"
-  , "lol,@omg"
-  , "+lol,omg,&wtf"
-  , "hej,hej"
-  ]
-, "bad":
-  [ " "
-  , ":"
-  , ",,"
-  , "\u0007"
+{
+  "good": [
+    "@lol",
+    "lol,@omg",
+    "+lol,omg,&wtf",
+    "hej,hej"
+  ],
+  "bad": [
+    " ",
+    ":",
+    ",,",
+    "\u0007"
   ]
 }

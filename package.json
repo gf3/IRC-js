@@ -1,31 +1,35 @@
-{ "name" : "irc-js"
-, "description" : "An IRC library for node.js"
-, "author" : "Gianni Chiappetta <gianni@runlevel6.org> (http://gf3.ca)"
-, "contributors" :
-  [ "Adam Bergmark"
-  , "Martin Häger <martin.haeger@gmail.com> (http://freeasinbeard.org)"
-  , "temp01"
-  , "Diogo Gomes <maushu@graphnode.com> (http://www.graphnode.com/)"
-  , "Nathan Rajlich <nathan@tootallnate.net> (http://tootallnate.net)"
-  ]
-, "homepage" : "http://gf3.github.com/IRC-js/"
-, "version" : "2.0.0-beta"
-, "main" : "./lib/irc"
-, "directories" : { "lib" : "./lib", "node_libraries" : "./node_libraries" }
-, "//" : "Using V8 options that I know are present in this version."
-, "//" : "Dunno how to find+specify max compat version, or how to find lowest *actual* compatible version. Halp?"
-, "engines" : { "node" : ">=0.8.1 <0.9" }
-, "devDependencies" :
-  { "mocha" : ">=1.2.2"
-  , "should" : ">=0.6.3"
-  }
-, "repository" :
-  { "type" : "git"
-  , "url" : "https://gf3@github.com/gf3/IRC-js.git"
-  }
-, "license" :
-  { "type" : "Public Domain"
-  , "url" : "http://github.com/gf3/IRC-js/raw/master/UNLICENSE"
+{
+  "name": "irc-js",
+  "description": "An IRC library for node.js",
+  "author": "Gianni Chiappetta <gianni@runlevel6.org> (http://gf3.ca)",
+  "contributors": [
+    "Adam Bergmark",
+    "Diogo Gomes <maushu@graphnode.com> (http://www.graphnode.com/)",
+    "Martin Häger <martin.haeger@gmail.com> (http://freeasinbeard.org)",
+    "Nathan Rajlich <nathan@tootallnate.net> (http://tootallnate.net)",
+    "temp01"
+  ],
+  "homepage": "http://gf3.github.com/IRC-js/",
+  "version": "2.0.0-beta",
+  "main": "./lib/irc",
+  "directories": {
+    "lib": "./lib",
+    "node_libraries": "./node_libraries"
+  },
+  "engines": {
+    "node": ">=0.8.1"
+  },
+  "devDependencies": {
+    "mocha": ">=1.2.2",
+    "pegjs": "git://github.com/nlogax/pegjs.git",
+    "should": ">=0.6.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gf3@github.com/gf3/IRC-js.git"
+  },
+  "license": {
+    "type": "Public Domain",
+    "url": "http://github.com/gf3/IRC-js/raw/master/UNLICENSE"
   }
 }
-

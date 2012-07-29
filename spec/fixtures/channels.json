@@ -1,15 +1,16 @@
-{ "good":
-  [ "#hash"
-  , "##doublehash"
-  , "!safe"
-  , "+plus"
-  , "&amp"
-  ]
-, "bad":
-  [ "noprefix"
-  , "#spa ces"
-  , "#bell\u0007bell"
-  , "#co:lon"
-  , "#co,mma"
+{
+  "good": [
+    "#hash",
+    "##doublehash",
+    "!safe",
+    "+plus",
+    "&amp"
+  ],
+  "bad": [
+    "noprefix",
+    "#spa ces",
+    "#bell\u0007bell",
+    "#co:lon",
+    "#co,mma"
   ]
 }

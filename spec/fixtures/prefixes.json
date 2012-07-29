@@ -1,19 +1,20 @@
-{ "good":
-  [ "js-irc!n=js-irc@CPE00226b711143-CM001bd7abd99c.cpe.net.cable.rogers.com"
-  , "brown.freenode.net"
-  , "ChanServ!ChanServ@services."
-  , "crichton.freenode.net"
-  , "js-irc!n=js-irc@bas1-hamilton14-1177553042.dsl.bell.ca"
-  , "gf3!n=gianni@pdpc/supporter/active/gf3"
-  , "frigg!~frigg@freenode/utility-bot/frigg"
-  , "protobot!~protobot@CPE00226b711143-CM001bd7abd99c.cpe.net.cable.rogers.com"
-  , "dandean!~dandean@c-66-235-3-99.sea.wa.customer.broadstripe.net"
-  , "Hornet!~hornet@cpc3-ipsw1-0-0-cust381.5-4.cable.virginmedia.com"
-  , "der|!~der|@xxx.xxx.xxx.xxx"
-  , "dfr|mac!dfr|work@nat/google/x-eltajcubwujzgfkk"
-  ]
-, "bad":
-  [ "asd"
-  , ":)))"
+{
+  "good": [
+    "js-irc!n=js-irc@CPE00226b711143-CM001bd7abd99c.cpe.net.cable.rogers.com",
+    "brown.freenode.net",
+    "ChanServ!ChanServ@services.",
+    "crichton.freenode.net",
+    "js-irc!n=js-irc@bas1-hamilton14-1177553042.dsl.bell.ca",
+    "gf3!n=gianni@pdpc/supporter/active/gf3",
+    "frigg!~frigg@freenode/utility-bot/frigg",
+    "protobot!~protobot@CPE00226b711143-CM001bd7abd99c.cpe.net.cable.rogers.com",
+    "dandean!~dandean@c-66-235-3-99.sea.wa.customer.broadstripe.net",
+    "Hornet!~hornet@cpc3-ipsw1-0-0-cust381.5-4.cable.virginmedia.com",
+    "der|!~der@xxx.xxx.xxx.xxx",
+    "dfr|mac!dfrwork@nat/google/x-eltajcubwujzgfkk"
+  ],
+  "bad": [
+    "asd",
+    ":)))"
   ]
 }
