@@ -34,7 +34,7 @@ Nick
   }
 
 User
-  = "!" chars:(AlphaNum / SquareBrackets / [-_=.~^\\`])+ {
+  = "!" chars:(AlphaNum / SquareBrackets / [-_=.|~^\\`])+ {
     return chars.join("");
   }
 

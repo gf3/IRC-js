@@ -27,7 +27,7 @@
     ":dandean!~dandean@c-66-235-3-99.sea.wa.customer.broadstripe.net QUIT :Ping timeout: 276 seconds\r\n",
     ":Hornet!~hornet@cpc3-ipsw1-0-0-cust381.5-4.cable.virginmedia.com JOIN #prototype\r\n",
     ":der|!~der@xxx.xxx.xxx.xxx PRIVMSG #Node.js :foo\r\n",
-    ":dfr|mac!dfrwork@nat/google/x-eltajcubwujzgfkk QUIT :Ping timeout: 240 seconds\r\n",
+    ":dfr|mac!dfr|work@nat/google/x-eltajcubwujzgfkk QUIT :Ping timeout: 240 seconds\r\n",
     ":leguin.freenode.net 333 basic-irc-js-bot #nlogax basic-irc-js-bot!~irc-js@c-89-160-40-86.cust.bredband2.com 1332238371\r\n",
     ":topic@setter.com TOPIC #topicz :Nice topic\r\n",
     ":card.freenode.net 353 dm5000 @ #nlogax :dm5000 nlogax\r\n",
