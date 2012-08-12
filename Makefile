@@ -8,9 +8,6 @@ MOCHA = ./node_modules/mocha/bin/_mocha
 tags:
 	$(CTAGS) lib/irc.js lib/parser.js spec/**/*.js
 
-parser:
-	@node --use_strict --harmony ./build.js parser;\
-
 test-irc:
 	@export IRCJS_TEST=1;\
 	node --harmony $(MOCHA) --reporter spec --require should spec/lib/irc.spec.js;\

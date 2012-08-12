@@ -21,7 +21,6 @@
   },
   "devDependencies": {
     "mocha": ">=1.2.2",
-    "pegjs": "git://github.com/nlogax/pegjs.git",
     "should": ">=0.6.3"
   },
   "repository": {

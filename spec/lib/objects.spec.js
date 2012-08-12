@@ -8,9 +8,8 @@ const path    = require("path");
 const should  = require("should");
 const help    = require(path.join(__dirname, "..", "helpers"));
 const lib     = path.join(__dirname, "..", "..", "lib");
-const IRC     = require(path.join(lib, "irc"));
+const irc     = require(path.join(lib, "irc"));
 const cs      = require(path.join(lib, "constants"));
-const o       = require(path.join(lib, "objects"));
 const server  = require(path.join("..", "server")).server;
 const bit     = help.bit;
 const COMMAND = cs.COMMAND;
@@ -25,8 +24,8 @@ describe("objects", function() {
   describe("Message", function() {
     describe("send", function() {
       bit("should send itself", function(done) {
-        const txt = o.trailing("Message, send thyself");
-        const msg = o.message(COMMAND.PRIVMSG, ["#nlogax", txt]);
+        const txt = irc.trailing("Message, send thyself");
+        const msg = irc.message(COMMAND.PRIVMSG, ["#nlogax", txt]);
         msg.client = this;
         server.on("message", function ok(m) {
           if (!/PRIVMSG #nlogax/.test(m)) {
@@ -42,7 +41,7 @@ describe("objects", function() {
 
     describe("reply", function() {
       bit("should reply to channel messages", function(done) {
-        const msg = o.message(o.person("gf3"), COMMAND.PRIVMSG, ["#jquery-ot", ":wat"]);
+        const msg = irc.message(irc.person("gf3"), COMMAND.PRIVMSG, ["#jquery-ot", ":wat"]);
         msg.client = this;
         server.on("message", function ok(m) {
           if (!/PRIVMSG #jquery-ot/.test(m)) {
@@ -56,7 +55,7 @@ describe("objects", function() {
       });
 
       bit("should reply to direct messages", function(done) {
-        const msg = o.message(o.person("gf3"), COMMAND.PRIVMSG, [this.user.nick, ":wat"]);
+        const msg = irc.message(irc.person("gf3"), COMMAND.PRIVMSG, [this.user.nick, ":wat"]);
         msg.client = this;
         server.on("message", function ok(m) {
           if (!/PRIVMSG gf3/.test(m)) {
@@ -72,34 +71,34 @@ describe("objects", function() {
 
     describe("factory function", function() {
       it("should support convenient signatures", function() {
-        let m = o.message(COMMAND.LIST);
-        m.should.be.an.instanceof(o.Message);
+        let m = irc.message(COMMAND.LIST);
+        m.should.be.an.instanceof(irc.Message);
         m.type.should.equal(COMMAND.LIST);
         should.equal(m.from, null);
         m.params.should.eql([]);
 
-        m = o.message(COMMAND.JOIN, [ "#jquery" ]);
-        m.should.be.an.instanceof(o.Message);
+        m = irc.message(COMMAND.JOIN, [ "#jquery" ]);
+        m.should.be.an.instanceof(irc.Message);
         m.type.should.equal(COMMAND.JOIN);
         should.equal(m.from, null);
         m.params.should.eql([ "#jquery"]);
 
-        m = o.message(COMMAND.PRIVMSG, [ "#jquery", ": Hey" ]);
-        m.should.be.an.instanceof(o.Message);
+        m = irc.message(COMMAND.PRIVMSG, [ "#jquery", ": Hey" ]);
+        m.should.be.an.instanceof(irc.Message);
         m.type.should.equal(COMMAND.PRIVMSG);
         should.equal(m.from, null);
         m.params.should.eql([ "#jquery", ": Hey" ]);
 
-        m = o.message(o.person("lol"), COMMAND.PRIVMSG, [ "#jquery", ": Hey" ]);
-        m.should.be.an.instanceof(o.Message);
+        m = irc.message(irc.person("lol"), COMMAND.PRIVMSG, [ "#jquery", ": Hey" ]);
+        m.should.be.an.instanceof(irc.Message);
         m.type.should.equal(COMMAND.PRIVMSG);
-        m.from.should.eql(o.person("lol"));
+        m.from.should.eql(irc.person("lol"));
         m.params.should.eql([ "#jquery", ": Hey" ]);
       });
 
       it("should throw an error if no suitable signature", function() {
-        o.message.bind(null, 1, 2, 3, 4).should.throw(/signature/);
-        o.message.bind(null).should.throw(/signature/);
+        irc.message.bind(null, 1, 2, 3, 4).should.throw(/signature/);
+        irc.message.bind(null).should.throw(/signature/);
       });
     });
   });
@@ -107,14 +106,14 @@ describe("objects", function() {
   describe("Channel", function() {
     describe("toString", function() {
       it("should serialize into its name", function() {
-        const chan = o.channel("#nlogax");
+        const chan = irc.channel("#nlogax");
         chan.toString().should.equal(chan.name);
       });
     });
 
     describe("topic", function() {
       bit("should set its own topic", function(done) {
-        const chan  = o.channel("#setowntopic");
+        const chan  = irc.channel("#setowntopic");
         const topic = "My own topic should be set to this";
         chan.client = this;
         chan.join();
@@ -148,7 +147,7 @@ describe("objects", function() {
 
     describe("mode", function() {
       bit("should record the channel mode", function(done) {
-        const chan = o.channel("#gotmodez");
+        const chan = irc.channel("#gotmodez");
         this.join(chan);
         server.recite(f(":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan));
         server.recite(":the.server.com MODE #gotmodez +ami\r\n");
@@ -185,7 +184,7 @@ describe("objects", function() {
 
     describe("invite", function() {
       bit("should invite people by name", function(done) {
-        const chan = o.channel("#peoplewithnames");
+        const chan = irc.channel("#peoplewithnames");
         const user = "namedperson";
         chan.client = this;
         server.on("message", function ok(m) {
@@ -203,8 +202,8 @@ describe("objects", function() {
       });
 
       bit("should invite Person objects", function(done) {
-        const chan = o.channel("#objectified");
-        const user = o.person("obj", "lol", "omg");
+        const chan = irc.channel("#objectified");
+        const user = irc.person("obj", "lol", "omg");
         chan.client = this;
         server.on("message", function ok(m) {
           if (!/INVITE/.test(m)) {
@@ -220,7 +219,7 @@ describe("objects", function() {
 
     describe("join", function() {
       bit("should join a Channel object", function(done) {
-        const chan = o.channel("#joiners");
+        const chan = irc.channel("#joiners");
         chan.client = this;
         server.on("message", function ok(m) {
           if (!/JOIN/.test(m)) {
@@ -237,7 +236,7 @@ describe("objects", function() {
       });
 
       bit("should join a Channel object with a key", function(done) {
-        const chan = o.channel("#keyjoin");
+        const chan = irc.channel("#keyjoin");
         const key = "keymaster";
         const bot = this;
         chan.client = bot;
@@ -259,13 +258,13 @@ describe("objects", function() {
       });
 
       bit("should join a Channel object with a callback", function(done) {
-        const chan = o.channel("#callbackz");
+        const chan = irc.channel("#callbackz");
         const bot = this;
         chan.client = bot;
         chan.join(function(ch) {
           chan.should.equal(ch);
           ch.people.has(bot.user.id).should.equal(true);
-          ch.people.has(o.id("nlogax")).should.equal(true);
+          ch.people.has(irc.id("nlogax")).should.equal(true);
           done();
         });
         server.on("message", function ok(m) {
@@ -281,7 +280,7 @@ describe("objects", function() {
       });
 
       bit("should join a Channel object with a key and a callback", function(done) {
-        const chan  = o.channel("#keycallback");
+        const chan  = irc.channel("#keycallback");
         const key   = "keyback";
         chan.client = this;
         chan.join(key, function(ch) {
@@ -319,24 +318,24 @@ describe("objects", function() {
         const l = ers.length;
         let i = 0;
         ers.forEach(function(e) {
-          const chan = o.channel(f("#failjoin%s", e));
+          const chan = irc.channel(f("#failjoin%s", e));
           chan.client = bot;
           chan.join(function(chn, err) {
-            chn.should.be.an.instanceof(o.Channel);
+            chn.should.be.an.instanceof(irc.Channel);
             err.should.be.an.instanceof(Error);
             err.message.should.equal(f("Cannot join channel (%s)", e));
             if (++i === l) {
               done();
             }
           });
-          server.recite(f(":n.o.u %s %s :%s\r\n", e, chan, f("Cannot join channel (%s)", e)));
+          server.recite(f(":n.irc.u %s %s :%s\r\n", e, chan, f("Cannot join channel (%s)", e)));
         });
       });
     });
 
     describe("kick", function() {
       bit("should kick people by name", function(done) {
-        const chan = o.channel("#meanies");
+        const chan = irc.channel("#meanies");
         const user = "victim";
         chan.client = this;
         chan.join();
@@ -352,8 +351,8 @@ describe("objects", function() {
       });
 
       bit("should kick Person objects", function(done) {
-        const chan = o.channel("#meanies");
-        const user = o.person("victim");
+        const chan = irc.channel("#meanies");
+        const user = irc.person("victim");
         chan.client = this;
         chan.join();
         server.on("message", function ok(m) {
@@ -370,7 +369,7 @@ describe("objects", function() {
 
     describe("notify", function() {
       bit("should get notified", function(done) {
-        const chan   = o.channel("#notifications");
+        const chan   = irc.channel("#notifications");
         const notice = "Important announcement";
         chan.client = this;
         server.on("message", function ok(m) {
@@ -387,11 +386,11 @@ describe("objects", function() {
 
     describe("factory function", function() {
       it("should support convenient signatures", function() {
-        o.channel("#lol").should.be.an.instanceof(o.Channel);
+        irc.channel("#lol").should.be.an.instanceof(irc.Channel);
       });
 
       it("should throw an error if no suitable signature", function() {
-        o.channel.bind(null).should.throw(/signature/);
+        irc.channel.bind(null).should.throw(/signature/);
       });
     });
   });
@@ -399,7 +398,7 @@ describe("objects", function() {
   describe("Person", function() {
     describe("toString", function() {
       it("should serialize into its nick, user and host", function() {
-        const p = o.person("anick", "auser", "ahost");
+        const p = irc.person("anick", "auser", "ahost");
         p.toString().should.equal("anick!auser@ahost");
         p.user = null;
         p.toString().should.equal("anick@ahost");
@@ -410,7 +409,7 @@ describe("objects", function() {
 
     describe("kickFrom", function() {
       bit("should get kicked from a channel by name", function(done) {
-        const prsn = o.person("kicked1", "ki", "ck");
+        const prsn = irc.person("kicked1", "ki", "ck");
         const chan = "#namekick";
         prsn.client = this;
         server.on("message", function ok(m) {
@@ -425,8 +424,8 @@ describe("objects", function() {
       });
 
       bit("should get kicked from a Channel object", function(done) {
-        const prsn = o.person("kicked2", "bo", "om");
-        const chan = o.channel("#objkick");
+        const prsn = irc.person("kicked2", "bo", "om");
+        const chan = irc.channel("#objkick");
         prsn.client = this;
         chan.client = this;
         chan.join();
@@ -444,8 +443,8 @@ describe("objects", function() {
 
     describe("inviteTo", function() {
       bit("should get invited to a channel, by name or Channel object", function(done) {
-        const prsn = o.person("gf3", "eh", "canada");
-        const chan = o.channel("#america");
+        const prsn = irc.person("gf3", "eh", "canada");
+        const chan = irc.channel("#america");
         prsn.client = this;
         server.on("message", function ok(m) {
           server.removeListener("message", ok);
@@ -458,7 +457,7 @@ describe("objects", function() {
 
     describe("notify", function() {
       bit("should get notified", function(done) {
-        const person = o.person("gf3");
+        const person = irc.person("gf3");
         const notice = "Important announcement";
         person.client = this;
         server.on("message", function ok(m) {
@@ -472,26 +471,26 @@ describe("objects", function() {
 
     describe("factory function", function() {
       it("should support convenient signatures", function() {
-        let p = o.person("lol1");
-        p.should.be.an.instanceof(o.Person);
+        let p = irc.person("lol1");
+        p.should.be.an.instanceof(irc.Person);
         p.nick.should.equal("lol1");
         should.not.exist(p.user);
         should.not.exist(p.host);
-        p = o.person("lol2", "omg");
-        p.should.be.an.instanceof(o.Person);
+        p = irc.person("lol2", "omg");
+        p.should.be.an.instanceof(irc.Person);
         p.nick.should.equal("lol2");
         p.user.should.equal("omg");
         should.not.exist(p.host);
-        p = o.person("lol3", "omg", "wtf");
-        p.should.be.an.instanceof(o.Person);
+        p = irc.person("lol3", "omg", "wtf");
+        p.should.be.an.instanceof(irc.Person);
         p.nick.should.equal("lol3");
         p.user.should.equal("omg");
         p.host.should.equal("wtf");
       });
 
       it("should throw an error if no suitable signature", function() {
-        o.person.bind(null).should.throw(/signature/);
-        o.person.bind(null, 1, 2, 3, 4).should.throw(/signature/);
+        irc.person.bind(null).should.throw(/signature/);
+        irc.person.bind(null, 1, 2, 3, 4).should.throw(/signature/);
       });
     });
   });

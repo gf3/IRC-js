@@ -60,7 +60,7 @@ mockServer.recite = function(stuff) {
 }
 
 function onJoin(msg) {
-  const ch = prs.channel(msg.params[0]);
+  const ch = prs.parseChannel(msg.params[0]);
 }
 
 exports.server  = mockServer;
