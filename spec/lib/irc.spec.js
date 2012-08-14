@@ -27,7 +27,8 @@ describe("irc", function() {
   describe("Client", function() {
     describe("send", function() {
       bit("should truncate messages to 512 bytes (including \"\\r\\n\")", function(done) {
-        const longAssString = ":" + Array(567).join("*");
+        const longAssString = ":" + Array(601).join("*");
+        const msg = irc.message(COMMAND.PRIVMSG, ["#longassstrings", longAssString]);
         server.on("message", function ok(d) {
           if (/PRIVMSG #longassstrings/.test(d)) {
             server.removeListener("message", ok);
@@ -35,7 +36,7 @@ describe("irc", function() {
             done();
           }
         });
-        this.send(irc.message(COMMAND.PRIVMSG, ["#longassstrings", longAssString]));
+        this.send(msg);
       });
     });
 

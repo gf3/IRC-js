@@ -126,10 +126,11 @@ describe("parser", function() {
 
     // Buffer to Message to Buffer
     it("should serialize message objects back into equivalent buffers", function() {
+      const bigEnoughBuff = new Buffer(9001);
       messages.good.forEach(function(msg, ix) {
-        const buf = parse(msg).toBuffer();
-        const len = buf.readUInt16LE(514);
-        buf.toString(null, 0, len).should.eql(msg);
+        parse(msg).toBuffer(bigEnoughBuff);
+        const len = bigEnoughBuff.readUInt16LE(0);
+        bigEnoughBuff.toString(null, 4, len).should.eql(msg);
       });
     });
   });

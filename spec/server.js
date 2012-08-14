@@ -20,14 +20,6 @@ const mockServer = new net.Server(function(s) {
   mockServer.received = [];
   mockServer.sent = [];
 
-  mockServer.on("recite", function(data) {
-    if (s.readyState !== "open") {
-      return "GTFO";
-    }
-    mockServer.sent.unshift(data);
-    s.write(data);
-  });
-
   s.on("data", function(data) {
     const parts = data.match(MSG);
     const out = [];
@@ -48,6 +40,14 @@ const mockServer = new net.Server(function(s) {
     if (out.length) {
       buf.push.apply(buf, out);
     }
+  });
+
+  mockServer.on("recite", function(data) {
+    if (s.readyState !== "open") {
+      return "GTFO";
+    }
+    mockServer.sent.unshift(data);
+    s.write(data);
   });
 
   s.on("end", function() {
