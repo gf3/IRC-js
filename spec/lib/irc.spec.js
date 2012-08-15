@@ -403,8 +403,27 @@ describe("irc", function() {
         }
       });
       server.recite(":chop!chop@choppers PR");
-      server.recite("IVMSG #choppy :Mad chopz\r\nNOTICE AUTH :*** Looking up your hostna");
-      server.recite("mez...\r\n");
+      setTimeout(function() {
+        server.recite("IVMSG #choppy :Mad chopz\r\nNOTICE AUTH :*** Looking up your hostna");
+      },10);
+      setTimeout(function() {
+        server.recite("mez...\r\n");
+      },20);
+    });
+
+    bit("should handle multiple messages in one packet", function(done) {
+      const bot = this;
+      let got = 0;
+      bot.listen(COMMAND.NOTICE, function handler(msg) {
+        if (20 === ++got) {
+          bot.ignore(COMMAND.NOTICE, handler);
+          done();
+        }
+      });
+      server.recite("NOTICE AUTH 1\r\nNOTICE AUTH 2\r\nNOTICE AUTH 3\r\nNOTICE AUTH 4\r\nNOTICE AUTH 5\r\n" +
+        "NOTICE AUTH 6\r\nNOTICE AUTH 7\r\nNOTICE AUTH 8\r\nNOTICE AUTH 9\r\nNOTICE AUTH 10\r\n" +
+        "NOTICE AUTH 11\r\nNOTICE AUTH 12\r\nNOTICE AUTH 13\r\nNOTICE AUTH 14\r\nNOTICE AUTH 15\r\n" +
+        "NOTICE AUTH 16\r\nNOTICE AUTH 17\r\nNOTICE AUTH 18\r\nNOTICE AUTH 19\r\nNOTICE AUTH 20\r\n");
     });
   });
 
