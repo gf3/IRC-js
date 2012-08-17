@@ -75,7 +75,7 @@ describe("irc", function() {
           bot.ignore(REPLY.MYINFO, handler);
           done();
         }
-        bot.listen(REPLY.MYINFO, handler);
+        bot.match(REPLY.MYINFO, handler);
         server.recite(f(":holmes.freenode.net 004 %s holmes.freenode.net ircd-seven-1.1.3 DOQRSZaghilopswz CFILMPQbcefgijklmnopqrstvz bkloveqjfI\r\n",
           this.user.nick))
       });
@@ -244,7 +244,7 @@ describe("irc", function() {
             bot.channels.has(chan.id).should.equal(false);
             bot.ignore(COMMAND.PART, handler);
           }
-          bot.listen(COMMAND.PART, handler);
+          bot.match(COMMAND.PART, handler);
           server.recite(f(":%s!~a@b.c PART %s\r\n", bot.user.nick, chan));
           done();
         });
@@ -377,7 +377,7 @@ describe("irc", function() {
         bot.ignore(EVENT.ANY, handler);
         done();
       }
-      bot.listen(EVENT.ANY, handler);
+      bot.match(EVENT.ANY, handler);
       server.recite(":gf3!n=gianni@pdpc/supporter/active/gf3 PRIVMSG #runlevel6 :ANY LOL\r\n");
     });
   });
@@ -386,7 +386,7 @@ describe("irc", function() {
     bit("should handle chopped up messages", function(done) {
       const bot = this;
       let got = 0;
-      bot.listen(COMMAND.PRIVMSG, function handler(msg) {
+      bot.match(COMMAND.PRIVMSG, function handler(msg) {
         if (msg.params[1] === ":Mad chopz") {
           bot.ignore(COMMAND.PRIVMSG, handler);
           if (2 === ++got) {
@@ -394,7 +394,7 @@ describe("irc", function() {
           }
         }
       });
-      bot.listen(COMMAND.NOTICE, function handler(msg) {
+      bot.match(COMMAND.NOTICE, function handler(msg) {
         if (msg.params[1] === ":*** Looking up your hostnamez...") {
           bot.ignore(COMMAND.NOTICE, handler);
           if (2 === ++got) {
@@ -414,7 +414,7 @@ describe("irc", function() {
     bit("should handle multiple messages in one packet", function(done) {
       const bot = this;
       let got = 0;
-      bot.listen(COMMAND.NOTICE, function handler(msg) {
+      bot.match(COMMAND.NOTICE, function handler(msg) {
         if (20 === ++got) {
           bot.ignore(COMMAND.NOTICE, handler);
           done();
