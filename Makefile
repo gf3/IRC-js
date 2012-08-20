@@ -23,7 +23,3 @@ test-objects:
 test-parser:
 	@export IRCJS_TEST=1;\
 	node --harmony $(MOCHA) --reporter spec --require should spec/lib/parser.spec.js;\
-
-test-signal:
-	@export IRCJS_TEST=1;\
-	node --harmony $(MOCHA) --reporter spec --require should spec/lib/signal.spec.js;\
