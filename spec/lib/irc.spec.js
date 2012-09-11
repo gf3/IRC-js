@@ -19,7 +19,7 @@ const REPLY   = cs.REPLY;
 const STATUS  = irc.STATUS;
 
 // Make sure config files are up to date
-const defaultConf = JSON.parse(fs.readFileSync(path.join(lib, "config.json")));
+const defaultConf = JSON.parse(fs.readFileSync(path.join(lib, "..", "config-example.json")));
 const testingConf = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
 const noComments  = function(k) { return k !== "//" }; // :) // :)
 
@@ -82,7 +82,16 @@ describe("irc", function() {
     });
 
     describe("nick", function() {
-      bit("should change the nickname");
+      bit("should change the nickname", function(done) {
+        const bot = this;
+        const prevNick = bot.user.nick;
+        server.recite(f(":%s@foo.com NICK changeling\r\n", prevNick));
+        setTimeout(function() {
+          bot.user.nick.should.equal("changeling");
+          bot.user.nick = prevNick;
+          done();
+        }, 10);
+      });
     });
 
     describe("quit", function() {
