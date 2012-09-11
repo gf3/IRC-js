@@ -340,11 +340,11 @@ describe("irc", function() {
           this.user.nick, "#channeltwo", nick));
       });
 
-      bit("should know that lol{}|^ is the same as LOL[]\\~", function(done) {
-        const lol = "#lol{}|^";
+      bit("should know that LOL[]\\~ is the same name as lol{}|^", function(done) {
+        const lol = "#LOL[]\\~";
         const bot = this;
         this.join(lol, function(ch) {
-          bot.channels.has("#LOL[]\\~").should.equal(true);
+          bot.channels.has("#lol{}|^").should.equal(true);
           done();
         });
         server.recite(f(":%s@wee JOIN %s\r\n", this.user.nick, lol));
