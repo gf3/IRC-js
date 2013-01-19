@@ -360,7 +360,7 @@ describe("irc", function() {
         const c1 = irc.channel("#fwdfrom");
         const c2 = irc.channel("#fwdto");
         const bot = this;
-        this.join(c1, function(ch, err) {
+        this.join(c1, function(err, ch) {
           err.should.be.an.instanceof(Error);
           err.message.should.equal("Forwarding to another channel");
           ch.name.should.equal(c2.name);

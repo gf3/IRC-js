@@ -320,7 +320,7 @@ describe("objects", function() {
         ers.forEach(function(e) {
           const chan = irc.channel(f("#failjoin%s", e));
           chan.client = bot;
-          chan.join(function(chn, err) {
+          chan.join(function(err, chn) {
             chn.should.be.an.instanceof(irc.Channel);
             err.should.be.an.instanceof(Error);
             err.message.should.equal(f("Cannot join channel (%s)", e));
