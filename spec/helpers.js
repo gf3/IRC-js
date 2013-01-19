@@ -14,8 +14,7 @@ const cobj = JSON.parse(fs.readFileSync(conf, "utf8"));
 const server = srv.server;
 
 server.listen(cobj.server.port, cobj.server.address);
-
-const bot = irc.connect(conf);
+const bot = irc.connect(cobj);
 
 // Convenience wrapper around `it`, with added bottage/servage
 function bit(desc, f) {

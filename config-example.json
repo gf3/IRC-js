@@ -5,14 +5,11 @@
   "//": "Should the bot crash and burn on errors?",
   "die": false,
 
-  "//": "The encoding which the bot should use",
-  "encoding": "ascii",
-
   "//": "Prevent sending lots of messages in rapid succession",
   "flood-protection" : false,
 
   "//": "Logging level, any combination of: debug, info, warn, error (or: all, none)",
-  "log": "warn error",
+  "log": "none",
 
   "//": "Bot nickname",
   "nick": "irc-js",
@@ -24,9 +21,6 @@
 
     "//": "IRC server port",
     "port": 6667,
-
-    "//": "Connect using the Secure Sockets Layer protocol",
-    "ssl": false
   },
 
   "//": "The bot's user details",

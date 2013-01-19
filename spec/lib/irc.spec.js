@@ -18,11 +18,6 @@ const MODE    = cs.MODE;
 const REPLY   = cs.REPLY;
 const STATUS  = irc.STATUS;
 
-// Make sure config files are up to date
-const defaultConf = JSON.parse(fs.readFileSync(path.join(lib, "..", "config-example.json")));
-const testingConf = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json")));
-const noComments  = function(k) { return k !== "//" }; // :) // :)
-
 describe("irc", function() {
   describe("Client", function() {
     describe("send", function() {
@@ -433,17 +428,6 @@ describe("irc", function() {
         "NOTICE AUTH 6\r\nNOTICE AUTH 7\r\nNOTICE AUTH 8\r\nNOTICE AUTH 9\r\nNOTICE AUTH 10\r\n" +
         "NOTICE AUTH 11\r\nNOTICE AUTH 12\r\nNOTICE AUTH 13\r\nNOTICE AUTH 14\r\nNOTICE AUTH 15\r\n" +
         "NOTICE AUTH 16\r\nNOTICE AUTH 17\r\nNOTICE AUTH 18\r\nNOTICE AUTH 19\r\nNOTICE AUTH 20\r\n");
-    });
-  });
-
-  describe("configuration", function() {
-    it("should be kept in sync with provided default config", function() {
-      const defKeys  = Object.keys(defaultConf).filter(noComments);
-      const testKeys = Object.keys(testingConf).filter(noComments);
-      defKeys.length.should.equal(testKeys.length);
-      defKeys.every(function(k) { return k in testingConf }).should.be.ok;
-      Object.keys(defaultConf.user).should.eql(Object.keys(testingConf.user));
-      Object.keys(defaultConf.server).should.eql(Object.keys(testingConf.server));
     });
   });
 });
