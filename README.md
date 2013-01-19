@@ -35,28 +35,36 @@ var irc = require("irc-js");
 
 /* First, lets create an IRC Client.
  * The quickest way is to use the laziness function `irc.connect()`.
- * It takes a path to a config file, and returns a Client instance.
- * You can find an example config file in the root of this package.
+ * It takes an object configuring the bot, and returns a Client instance.
  */
-irc.connect("conf.json", function(bot) {
+irc.connect({ nick: "bot500" }, function(bot) {
   /* This optional callback means the client has connected.
    * It receives one argument: the Client instance.
    * Use the `join()` method to join a channel:
    */
-  bot.join("#runlevel6", function(chan) {
+  bot.join("#irc-js", function(err, chan) {
     /* You get this callback when the client has joined the channel.
-     * The argument here is a Channel instance.
+     * The argument here is any eventual Error, and the Channel joined.
+    if (err) {
+      console.log("Could not join channel :(", err);
+      return;
+    }
+    /*
      * Channels also have some handy methods:
      */
     chan.say("Hello!");
   });
 
+  /* You can also access channels like this:
+   * `bot.channels.get("#irc-js").say("Hello!");`
+   */
+
   /* Often you want your bot to do something when it receives a specific type
    * of message, or when a message contains something of interest.
    * The `match()` method lets you do both.
-   * Look for invites to channels:
+   * Look for INVITE messages and join channels:
    */
-  bot.match(irc.COMMAND.INVITE, function(msg) {
+  bot.match("INVITE", function(msg) {
     /* Here the argument is a Message instance.
      * You can look at the `from` property to see who sent it.
      * The `reply()` method sends a message to the appropriate channel or person:
@@ -68,19 +76,16 @@ irc.connect("conf.json", function(bot) {
     bot.join(msg.params[1]);
   });
 
-  /* Look for messages matching a regular expression: */
-  bot.match(/\bice\s+cream\b/, function(msg) {
-    msg.reply("Yum, I love ice cream.");
-  });
-
-  /* Again, but with match groups: */
-  bot.match(/^:google\s+(.+)/, function(msg, query) {
-    /* Here, the `query` argument contains whatever the first group matched.
-     * If you have more groups, you receive more arguments.
+  /* You can look for messages matching a regular expression.
+   * Each match group is passed as an argument to the callback function.
+   */
+  bot.match(/\bsomecommand\s+([a-z]+)\s+([0-9]+)/, function(msg, letters, digits) {
+    /* Here, the `letters` argument contains the text matched by the first group.
+     * And `digits` is the second match. More match groups means more arguments.
      */
   });
 });
 
 ```
 
-IRC-js 2.0 uses a couple of shiny new JavaScript features, so you must use the `--harmony` flag when running it.
+IRC-js 2.0 uses a couple of new ECMAScript features, so currently you must use the `--harmony` flag when running it.
