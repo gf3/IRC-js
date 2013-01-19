@@ -45,6 +45,7 @@ irc.connect({ nick: "bot500" }, function(bot) {
   bot.join("#irc-js", function(err, chan) {
     /* You get this callback when the client has joined the channel.
      * The argument here is any eventual Error, and the Channel joined.
+     */
     if (err) {
       console.log("Could not join channel :(", err);
       return;
