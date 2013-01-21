@@ -1,28 +1,47 @@
-# IRC-js
+IRC-js
+=====
 
-An IRC library for node.js
+The best IRC library for node.js
 
-[View Documentation](http://gf3.github.com/IRC-js/).
 
-## Installation
+Installation
+------------
 
-```sh
+Via command-line:
+
+``` sh
 npm install irc-js
 ```
 
-## Tests
+Via `package.json`:
 
-```sh
+``` json
+{ "dependencies":
+  { "irc-js": "2" }
+}
+```
+
+
+Tests
+-----
+
+``` sh
 make test
 ```
 
-# 2.0 Beta Notes
+
+2.0 Notes
+========
 
 We recently released the first beta of IRC-js 2.0.
 This release brings many changes, and documentation is not quite ready.
+
+IRC-js 2.0 uses a couple of new ECMAScript features, so currently you must use
+the `--harmony` flag when running it.
+
 So, for the adventurous, here's how to get started with 2.0:
 
-```js
+``` javascript
 /* IRC-js 2.0 provides a set of objects representing IRC entities, such as:
  *    Client    An IRC client, create one of these first.
  *    Message   A client sends and receives instances of this object.
@@ -86,7 +105,5 @@ irc.connect({ nick: "bot500" }, function(bot) {
      */
   });
 });
-
 ```
 
-IRC-js 2.0 uses a couple of new ECMAScript features, so currently you must use the `--harmony` flag when running it.
