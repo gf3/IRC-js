@@ -20,7 +20,7 @@
     "address": "chat.freenode.net",
 
     "//": "IRC server port",
-    "port": 6667,
+    "port": 6667
   },
 
   "//": "The bot's user details",
