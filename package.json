@@ -10,7 +10,7 @@
     "temp01"
   ],
   "homepage": "http://gf3.github.com/IRC-js/",
-  "version": "2.0.0-beta.3",
+  "version": "2.0.0-beta.4",
   "main": "./lib/irc",
   "directories": {
     "lib": "./lib",
