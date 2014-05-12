@@ -185,10 +185,9 @@ describe("irc", function() {
     describe("channels", function() {
       bit("should let you add channels by name", function(done) {
         const bot  = this;
-        const chan = this.join("#addchanname", function(ch) {
+        const chan = this.join("#addchanname", function() {
           bot.channels.has(chan.id).should.equal(true);
-          bot.channels.get(ch.id).should.equal(chan);
-          ch.should.equal(chan);
+          bot.channels.get(chan.id).should.equal(chan);
           done();
         });
         server.recite(f(":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan));
@@ -202,7 +201,7 @@ describe("irc", function() {
         this.join(chan, function(ch) {
           bot.channels.has(irc.id("#addchanobj")).should.equal(true);
           bot.channels.get(irc.id("#addchanobj")).should.equal(chan);
-          bot.channels.get(ch.id).should.equal(chan);
+          bot.channels.get(chan.id).should.equal(chan);
           done();
         });
         server.recite(f(":%s!~a@b.c JOIN %s\r\n", this.user.nick, chan));
@@ -330,12 +329,11 @@ describe("irc", function() {
         const nick = "unique";
         const bot  = this;
         bot.join("#channelone")
-        bot.join("#channeltwo",
-          function(ch) {
-            ch.people.get(irc.id(nick)).should.equal(
-              bot.channels.get(irc.id("#channelone")).people.get(irc.id(nick)));
-            done();
-          });
+        const ch = bot.join("#channeltwo", function() {
+          ch.people.get(irc.id(nick)).should.equal(
+            bot.channels.get(irc.id("#channelone")).people.get(irc.id(nick)));
+          done();
+        });
         server.recite(f(":%s@wee JOIN %s\r\n", this.user.nick, "#channelone"));
         server.recite(f(":%s@wee JOIN %s\r\n", this.user.nick, "#channeltwo"));
         server.recite(f(":card.freenode.net 353 %s @ %s :%s nlogax\r\n",
