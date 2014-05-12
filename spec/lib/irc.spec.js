@@ -427,5 +427,18 @@ describe("irc", function() {
         "NOTICE AUTH 11\r\nNOTICE AUTH 12\r\nNOTICE AUTH 13\r\nNOTICE AUTH 14\r\nNOTICE AUTH 15\r\n" +
         "NOTICE AUTH 16\r\nNOTICE AUTH 17\r\nNOTICE AUTH 18\r\nNOTICE AUTH 19\r\nNOTICE AUTH 20\r\n");
     });
+
+    bit("should forward errors to client", function(done) {
+      const bot = this;
+      let got = 0;
+      bot.match(cs.EVENT.ERROR, function() {
+        got++;
+        done();
+      });
+      bot.socket.emit("error");
+      setTimeout(function() {
+        got.should.equal(1);
+      }, 0);
+    });
   });
 });
