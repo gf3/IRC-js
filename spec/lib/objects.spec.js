@@ -261,7 +261,7 @@ describe("objects", function() {
         const chan = irc.channel("#callbackz");
         const bot = this;
         chan.client = bot;
-        chan.join(function(ch) {
+        const ch = chan.join(function() {
           chan.should.equal(ch);
           ch.people.has(bot.user.id).should.equal(true);
           ch.people.has(irc.id("nlogax")).should.equal(true);
@@ -283,7 +283,7 @@ describe("objects", function() {
         const chan  = irc.channel("#keycallback");
         const key   = "keyback";
         chan.client = this;
-        chan.join(key, function(ch) {
+        const ch = chan.join(key, function() {
           chan.should.equal(ch);
           done();
         });

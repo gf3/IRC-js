@@ -23,3 +23,5 @@ test-objects:
 test-parser:
 	@export IRCJS_TEST=1;\
 	node --harmony $(MOCHA) --reporter spec --require should spec/lib/parser.spec.js;\
+
+test: test-irc test-logger test-objects test-parser
